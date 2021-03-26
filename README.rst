@@ -5,13 +5,15 @@ Virtual Finance API
 .. .. image:: https://img.shields.io/pypi/v/virtual_finance_api.svg
         :target: https://pypi.python.org/pypi/virtual_finance_api
 
-.. image:: https://img.shields.io/travis/hootnot/virtual_finance_api.svg
-        :target: https://travis-ci.com/hootnot/virtual_finance_api
+.. image:: https://img.shields.io/travis/hootnot/virtual-finance-API.svg
+        :target: https://travis-ci.com/hootnot/virtual-finance-API
 
 .. .. image:: https://readthedocs.org/projects/virtual-finance-api/badge/?version=latest
         :target: https://virtual-finance-api.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
+.. image:: https://coveralls.io/repos/github/hootnot/virtual-finance-API/badge.svg?branch=main
+        :target: https://coveralls.io/github/hootnot/virtual-finance-API?branch=main
 
 
 
