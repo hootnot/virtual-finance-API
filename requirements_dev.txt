@@ -12,5 +12,9 @@ Click==7.0
 pandas
 sphinxcontrib-napoleon
 requests-mock
+nose
 parameterized
 sphinx_rtd_theme
+sphinx-click
+sphinxcontrib-serializinghtml
+sphinxcontrib-websupport
