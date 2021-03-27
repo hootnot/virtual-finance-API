@@ -4,6 +4,16 @@ Changelog
 [Unreleased]
 ------------
 
+v0.2.1 (2021-03-27)
+-------------------
+
+Documentation Changes
+~~~~~~~~~~~~~~~~~~~~~
+
+-  [sphinx] initial documentation setup
+
+-  [README] example added
+
 v0.2.0 (2021-03-26)
 -------------------
 
