@@ -8,8 +8,8 @@ Virtual Finance API
 .. image:: https://img.shields.io/travis/hootnot/virtual-finance-API.svg
         :target: https://travis-ci.com/hootnot/virtual-finance-API
 
-.. .. image:: https://readthedocs.org/projects/virtual-finance-api/badge/?version=latest
-        :target: https://virtual-finance-api.readthedocs.io/en/latest/?version=latest
+.. image:: https://readthedocs.org/projects/virtual-finance-api/badge/?version=latest
+        :target: https://virtual-finance-api.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 .. image:: https://coveralls.io/repos/github/hootnot/virtual-finance-API/badge.svg?branch=main

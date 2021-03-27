@@ -4,6 +4,11 @@ Changelog
 [Unreleased]
 ------------
 
+Bug Fixes
+~~~~~~~~~
+
+-  [docs] fix sphinx build
+
 v0.2.1 (2021-03-27)
 -------------------
 

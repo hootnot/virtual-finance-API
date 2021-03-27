@@ -19,7 +19,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('.'))
 
 import virtual_finance_api
 
@@ -31,7 +32,13 @@ import virtual_finance_api
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinxcontrib.napoleon', 'sphinx.ext.viewcode', 'sphinx_click.ext']
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinxcontrib.napoleon',
+    'sphinx.ext.viewcode',
+    'sphinx_click.ext',
+    'alabaster'
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -211,7 +218,7 @@ class ExecDirective(Directive):
 def setup(app):
     app.add_directive('exec', ExecDirective)
 
-if False and not on_rtd:  # only import and set the theme if we're building docs locally
+if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
     html_theme = 'sphinx_rtd_theme'
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
