@@ -31,7 +31,7 @@ import virtual_finance_api
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = ['sphinx.ext.autodoc', 'sphinxcontrib.napoleon', 'sphinx.ext.viewcode', 'sphinx_click.ext']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -69,7 +69,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store'] + ['readme.rst']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -83,7 +83,9 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+# html_theme = 'default'
 html_theme = 'alabaster'
+# html_style = 'css/my_theme.css'
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -159,4 +161,57 @@ texinfo_documents = [
 ]
 
 
+# texinfo_no_detailmenu = False
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+# napoleon_include_private_with_doc = False
+# napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+# custom directive (stackoverflow.com: 7250659)
+from os.path import basename
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+from docutils import nodes, statemachine
+from docutils.parsers.rst import Directive
+
+class ExecDirective(Directive):
+    """Execute the specified python code and insert the output into the document"""
+    has_content = True
+
+    def run(self):
+        oldStdout, sys.stdout = sys.stdout, StringIO()
+
+        tab_width = self.options.get('tab-width', self.state.document.settings.tab_width)
+        source = self.state_machine.input_lines.source(self.lineno - self.state_machine.input_offset - 1)
+
+        try:
+            exec('\n'.join(self.content))
+            text = sys.stdout.getvalue()
+            lines = statemachine.string2lines(text, tab_width, convert_whitespace=True)
+            self.state_machine.insert_input(lines, source)
+            return []
+        except Exception:
+            return [nodes.error(None, nodes.paragraph(text = "Unable to execute python code at %s:%d:" % (basename(source), self.lineno)), nodes.paragraph(text = str(sys.exc_info()[1])))]
+        finally:
+            sys.stdout = oldStdout
+
+def setup(app):
+    app.add_directive('exec', ExecDirective)
+
+if False and not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
