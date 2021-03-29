@@ -1,4 +1,4 @@
-Virtual Finance API: the library for finance!
+Virtual API: the library for finance!
 =============================================
 
 .. include:: ../../README.rst
@@ -10,6 +10,8 @@ Virtual Finance API: the library for finance!
 
    installation
    motivation
+   reference
+   cli
    usage
    changelog
 
