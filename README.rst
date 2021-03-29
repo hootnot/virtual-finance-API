@@ -16,6 +16,18 @@ Virtual Finance API
         :target: https://coveralls.io/github/hootnot/virtual-finance-API?branch=main
 
 
+Interactive
+-----------
+
+.. image:: https://jupyter.readthedocs.io/en/latest/_static/_images/jupyter.svg
+   :target: ./jupyter
+   :alt: Jupyter
+
+Using the Jupyter `notebook`_ it is easy to experiment with the
+*virtual_finance_api* library.
+
+.. _notebook: ./jupyter/index.ipynb
+
 
 The `Virtual Finance API` provides access to data from financial sites as if it was a REST-API.
 Currently covered:
