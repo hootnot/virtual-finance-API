@@ -15,6 +15,13 @@ Virtual Finance API
 .. image:: https://coveralls.io/repos/github/hootnot/virtual-finance-API/badge.svg?branch=main
         :target: https://coveralls.io/github/hootnot/virtual-finance-API?branch=main
 
+.. image:: https://img.shields.io/pypi/v/virtual_finance_api.svg
+        :target: https://pypi.org/project/virtual_finance_api
+        :alt: PyPI
+
+.. image:: https://img.shields.io/pypi/pyversions/virtual_finance_api.svg
+        :target: https://pypi.org/project/virtual_finance_api
+        :alt: Python versions
 
 Interactive
 -----------
