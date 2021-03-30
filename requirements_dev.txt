@@ -13,6 +13,7 @@ pandas
 sphinxcontrib-napoleon
 requests-mock
 nose
+rapidjson
 parameterized
 sphinx_rtd_theme
 sphinx-click

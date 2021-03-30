@@ -4,6 +4,33 @@ Changelog
 [Unreleased]
 ------------
 
+New Features
+~~~~~~~~~~~~
+
+-  [endpoints] yfinance compatibility endpoints
+
+Tests
+~~~~~
+
+-  [unitttest] yfinance compatible endpoint tests
+
+Bug Fixes
+~~~~~~~~~
+
+-  [docs] requirements_dev: missing packages
+
+Refactoring
+~~~~~~~~~~~
+
+-  [endpoints] use rapidjson instead of json
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [config] update requirements for rapidjson
+
+-  [config] update travis / tox config
+
 v0.2.2 (2021-03-27)
 -------------------
 
