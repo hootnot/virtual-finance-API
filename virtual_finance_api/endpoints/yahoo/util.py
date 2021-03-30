@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import json
+try:
+    import rapidjson as json
+except ImportError as err:  # noqa F841
+    import json
+
 import re
 
 

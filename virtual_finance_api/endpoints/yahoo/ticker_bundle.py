@@ -5,7 +5,11 @@ from ..decorators import endpoint, dyndoc_insert
 from .util import response2json
 import logging
 import pandas as pd
-import json
+
+try:
+    import rapidjson as json
+except ImportError as err:  # noqa F841
+    import json
 
 from ..apirequest import APIRequest, VirtualAPIRequest
 from abc import abstractmethod

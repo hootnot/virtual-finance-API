@@ -2,7 +2,12 @@
 
 import requests
 import logging
-import json
+
+try:
+    import rapidjson as json
+except ImportError as err:  # noqa F841
+    import json
+
 from .exceptions import (
     VirtualFinanceAPIError,
     ConversionHookError

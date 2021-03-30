@@ -3,7 +3,12 @@
 from ..decorators import endpoint, dyndoc_insert
 from ..apirequest import VirtualAPIRequest
 import pandas as pd
-import json
+
+try:
+    import rapidjson as json
+except ImportError as err:  # noqa F841
+    import json
+
 import logging
 from .responses.index_bundle import responses
 from ...exceptions import ConversionHookError

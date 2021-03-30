@@ -6,7 +6,11 @@ def dyndoc_insert(src):
     """docstring_insert - a decorator to insert API-docparts dynamically."""
     # manipulating docstrings this way is tricky due to indentation
     # the JSON needs leading whitespace to be interpreted correctly
-    import json
+    try:
+        import rapidjson as json
+    except ImportError as err:  # noqa F841
+        import json
+
     import re
 
     def mkblock(d, flag=0):
