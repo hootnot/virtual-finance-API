@@ -11,7 +11,7 @@ with open('CHANGELOG.rst') as history_file:
     history = history_file.read()
 
 # requirements = ['Click>=7.0', ]
-requirements = map(str.strip, open("requirements.txt").readlines())
+requirements = list(map(str.strip, open("requirements.txt").readlines()))
 
 setup_requirements = []
 
@@ -47,7 +47,7 @@ setup(
     name='virtual_finance_api',
     packages=find_packages(include=['virtual_finance_api',
                                     'virtual_finance_api.*']),
-    setup_requires=setup_requirements,
+    setup_requires=requirements,
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/hootnot/virtual_finance_api',
