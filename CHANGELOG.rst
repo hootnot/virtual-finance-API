@@ -4,6 +4,9 @@ Changelog
 [Unreleased]
 ------------
 
+v0.3.0 (2021-03-30)
+-------------------
+
 New Features
 ~~~~~~~~~~~~
 
@@ -27,8 +30,9 @@ Refactoring
 Administration and Chores
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  [config] update requirements for rapidjson
+-  [config] requirements, Makefile
 
+   update requirements: include rapidjson Makefile extended
 -  [config] update travis / tox config
 
 v0.2.2 (2021-03-27)
