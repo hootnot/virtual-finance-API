@@ -7,7 +7,7 @@ from .exceptions import VirtualFinanceAPIError  # noqa F401
 
 __author__ = """Feite Brekeveld"""
 __email__ = 'f.brekeveld@gmail.com'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 # Version synonym
 VERSION = __version__

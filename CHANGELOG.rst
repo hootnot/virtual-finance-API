@@ -4,6 +4,23 @@ Changelog
 [Unreleased]
 ------------
 
+v0.3.1 (2021-03-30)
+-------------------
+
+Documentation Changes
+~~~~~~~~~~~~~~~~~~~~~
+
+-  [README] badges added
+
+-  [README] extended with various components
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [config] setup.py include requirements correctly
+
+-  [travis] fix deployment to pypi
+
 v0.3.0 (2021-03-30)
 -------------------
 
