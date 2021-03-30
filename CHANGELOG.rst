@@ -4,6 +4,14 @@ Changelog
 [Unreleased]
 ------------
 
+v0.3.2 (2021-03-30)
+-------------------
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [requirements] python 3.6 up to pandas 1.1.5
+
 v0.3.1 (2021-03-30)
 -------------------
 
