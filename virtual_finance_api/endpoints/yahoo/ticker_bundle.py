@@ -89,7 +89,7 @@ class Financials(VirtualAPIRequest, Yhoo):
 # @endpoint('v7/finance/download/{ticker}')   # 7 or 8 ?
 @endpoint('v8/finance/chart/{ticker}', response_type='json',
           domain='https://query1.finance.yahoo.com')
-class History(Yhoo):
+class History(VirtualAPIRequest, Yhoo):
     """History - class to handle the history endpoint."""
 
     # @dyndoc_insert(responses)
@@ -107,6 +107,20 @@ class History(Yhoo):
         """
         super(History, self).__init__(ticker)
         self.params = params
+
+    def _conversion_hook(self, s):
+        rv = None
+        try:
+            rv = json.loads(s)
+
+        except Exception as err:
+            # let the client deal with the error
+            logger.error(err)
+            raise ConversionHookError(422, '')
+
+        else:
+            logger.info("conversion_hook: %s OK", self.ticker)
+            return rv
 
 
 @endpoint('quote/{ticker}/holders', domain='https://finance.yahoo.com')
@@ -167,7 +181,7 @@ class Holders(VirtualAPIRequest, Yhoo):
 @endpoint('v7/finance/options/{ticker}',
           domain='https://query1.finance.yahoo.com',
           response_type='json')
-class Options(Yhoo):
+class Options(VirtualAPIRequest, Yhoo):
     """Options - class to handle the options endpoint."""
 
     @dyndoc_insert(responses)
@@ -202,6 +216,18 @@ class Options(Yhoo):
 
         if params is not None:
             self.params.update(**params)
+
+    def _conversion_hook(self, s):
+        try:
+            rv = json.loads(s)
+
+        except Exception as err:  # noqa F841
+            # let the client deal with the error
+            raise ConversionHookError(422, '')
+
+        else:
+            logger.info("conversion_hook: %s OK", self.ticker)
+            return rv
 
 
 @endpoint('quote/{ticker}', domain='https://finance.yahoo.com')
