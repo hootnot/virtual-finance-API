@@ -1,5 +1,19 @@
 # -*- coding: utf-8 -*-
 
+"""The Ticker-class aims to be the compatible counterpart of yfinance.Ticker.
+The Ticker class basically wraps all the requests needed to represent all the
+properties like yfinance.Ticker.
+
+This class is provided for compatibility reasons. If you only need certain
+data, the advise is to use the request providing that data.
+
+If you still want the yfinance compatible output you can use one of the
+*compat.yfinance.endpoints* request classes.
+
+The other option is to use one tof the *extensions.stdjson* request classes.
+These classes provide a standardized JSON response.
+"""
+
 from .endpoints.bundle import (
     Financials,
     Profile,

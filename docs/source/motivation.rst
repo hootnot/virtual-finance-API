@@ -42,12 +42,12 @@ error code is returned. The client processes this the same way as if it was the 
 In case the second stage processing fails the original status code is set to a code identifying
 the final state:
 
-     + if processing was without errors but the desired result could not be created the status code is changed to 404, 'Not Found'
-     + if processing gave errors the status code is changed to 422, 'Unprocessable Entity'
+     + if processing was without errors, but the desired result could not be created, the status code is changed to 404, 'Not Found'
+     + in case processing gave errors, the status code is changed to 422, 'Unprocessable Entity'
 
 These status codes represent a REST-API server responding to client requests.
 
 
 There are a handful of endpoints that provide the information we need.
-The request classes wrap the logic to provide the JSON data fetched from
-the response, so acting as if that response was provided by Yahoo Finance.
+The request classes wrap the logic to provide the JSON data fetched (or fabricated) from
+the response, acting as if that response was provided by site that was called.

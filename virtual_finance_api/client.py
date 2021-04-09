@@ -24,6 +24,43 @@ DEFAULT_HEADERS = {
 class Client:
 
     def __init__(self, headers=None, request_params=None):
+        """Instantiate a Client instance.
+
+        Parameters
+        ----------
+
+        headers : dict (optional)
+            optional headers to set to requests
+
+        request_params : dict (optional)
+            optional parameters to set to requests
+
+
+        for details pls. check requests.readthedocs.io
+
+
+        Example
+        -------
+
+        >>> import virtual_finance_api as fa
+        >>> import virtual_finance_api.endpoints.yahoo as yh
+        >>> import json
+        >>> client = fa.Client()
+        >>> r = yh.Profile('IBM')
+        >>> try:
+        ...    rv = client.request(r)
+        ... except VirtualFinanceAPIError as err:
+        ...    print(err)
+        ... else:
+        ...    print(json.dumps(rv['pageViews'], indent=2))
+        {
+          "shortTermTrend": "NEUTRAL",
+          "midTermTrend": "UP",
+          "longTermTrend": "UP",
+          "maxAge": 1
+        }
+
+        """
         self._client = requests.Session()
         self._request_params = request_params if request_params else {}
 
@@ -49,7 +86,7 @@ class Client:
             or body data.
 
         Raises
-        ---------
+        ------
 
         VirtualFinanceAPIError
             in case of HTTP response code >= 400

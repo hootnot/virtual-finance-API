@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""This module provides the *yfinance* compatible requests.
+
+These requests are derived from the Yahoo base classes, but all classes provide
+*yfinance.Ticker* compatible properties. So, some return a dict, some return
+Pandas series and some return a Pandas dataframe, just like *yfinance* does.
+"""
 
 from .util import camel2title, extract_domain
 

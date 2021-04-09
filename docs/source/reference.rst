@@ -4,7 +4,7 @@ Reference
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Reference:
 
    virtual_finance_api

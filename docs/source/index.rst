@@ -10,9 +10,9 @@ Virtual API: the library for finance!
 
    installation
    motivation
+   usage
    reference
    cli
-   usage
    changelog
 
 ..   modules

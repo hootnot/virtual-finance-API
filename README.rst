@@ -117,16 +117,22 @@ Currently covered:
 
   + yahoo 'endpoints' to get:
 
-    - profile
-    - holders
     - financials
     - history
+    - holders
+    - options
+    - profile
+    - screener
+    - screeners
+    - yahooindex
 
   + business inisder 'endpoint':
 
     - fetch ISIN code
 
   + yfinance compatibility 'endpoints'
+
+  + standardized JSON 'endpoints'
 
 
 With `request-classes` for these endpoints, getting data is as easy as:
@@ -157,6 +163,41 @@ With `request-classes` for these endpoints, getting data is as easy as:
         "3": "Number of Institutions Holding Shares"
       }
    }
+
+With the *extensions.stdjson* endpoints this looks like:
+
+.. code-block:: python
+
+   >>> import virtual_finance_api.extensions.stdjson.endpoints as je
+   >>> client = fa.Client()
+   >>> r = je.Holders('IBM')
+   >>> rv = client.request(r)
+   # lets get the 'major' holders from that JSON response
+   >>> print(json.dumps(rv['major'], indent=2))
+
+   [
+     [
+       "0.13%",
+       "% of Shares Held by All Insider"
+     ],
+     [
+       "58.25%",
+       "% of Shares Held by Institutions"
+     ],
+     [
+       "58.33%",
+       "% of Float Held by Institutions"
+     ],
+     [
+       "2696",
+       "Number of Institutions Holding Shares"
+     ]
+   ]
+
+It make more sense to group the information. The base classes simply pass the
+JSON data the way it is scraped from the source URL. Derived classes can be
+used to transform this data. The *extension.stdjson* performs this task.
+
 
 Yfinance compatibility
 ----------------------
