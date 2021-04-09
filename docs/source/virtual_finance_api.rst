@@ -31,6 +31,16 @@ Business Insider endpoints
     :special-members: __init__
 
 
+Extensions: Standardized JSON  requests
+---------------------------------------
+
+.. automodule:: virtual_finance_api.extensions.stdjson.endpoints
+    :members:
+    :undoc-members:
+    :show-inheritance:
+    :special-members: __init__
+
+
 Compatibility requests: yfinance
 --------------------------------
 
