@@ -91,7 +91,7 @@ class Ticker:
 
         return getattr(self._r[key], attr)
 
-    def history(self, **kwargs):  # NOK
+    def history(self, **kwargs):
         params = kwargs if kwargs else {}
         for k, v in self._hparams.items():
             if k not in params:
@@ -116,16 +116,16 @@ class Ticker:
         return self._init('holders', Holders, 'mutualfund', kwargs={'ticker': self._ticker})  # noqa E501
 
     @property
-    def dividends(self):  # NOK
-        return self._init('history', History, 'dividends', kwargs={})
+    def dividends(self):
+        return self._init('history', History, 'dividends', kwargs={'ticker': self._ticker, 'period': 'max'})  # noqa E501
 
     @property
-    def splits(self):  # NOK
-        return self._init('history', History, 'splits', kwargs={})
+    def splits(self):
+        return self._init('history', History, 'splits', kwargs={'ticker': self._ticker, 'period': 'max'})  # noqa E501
 
     @property
-    def actions(self):  # NOK
-        return self._init('history', History, 'actions', kwargs={})
+    def actions(self):
+        return self._init('history', History, 'actions', kwargs={'ticker': self._ticker, 'period': 'max'})  # noqa E501
 
     @property
     def info(self):
