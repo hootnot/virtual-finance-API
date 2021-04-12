@@ -1,0 +1,19 @@
+{% import 'tag_format.jinja2' as macros %}
+# {{ title }}
+
+{% if description %}
+{{ description|wordwrap() }}
+{% endif %}
+
+## [Unreleased]
+
+
+{% for tag in tags %}
+
+{% if tag.name != 'unreleased' %}
+## {{ tag.name }} ({{ tag.date.strftime('%Y-%m-%d') }})
+{% endif %}
+
+{{ macros.commit_list_format(tag) }}
+
+{% endfor %}
