@@ -73,8 +73,11 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
+# the changelog conversion from markdown to rst needs the markdown [ .. ]
+# transformed into \[ .. ] to prevent the creation of links in rst
 changelog:
 	python gitlog.py --branch main | \
+	sed -e 's#^- \[#-  \\[#' | \
 	pandoc --from=markdown --to=rst | sed -e '/^\.\. _.*:/,+1d' >CHANGELOG.rst
 
 release: changelog
