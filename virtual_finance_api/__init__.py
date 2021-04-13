@@ -6,8 +6,8 @@ from .exceptions import VirtualFinanceAPIError  # noqa F401
 
 
 __author__ = """Feite Brekeveld"""
-__email__ = 'f.brekeveld@gmail.com'
-__version__ = '0.3.2'
+__email__ = "f.brekeveld@gmail.com"
+__version__ = "0.3.2"
 
 # Version synonym
 VERSION = __version__
@@ -17,13 +17,15 @@ try:
     from logging import NullHandler
 
 except ImportError:
+
     class NullHandler(logging.Handler):
         def emit(self, record):
             pass
 
+
 logging.getLogger(__name__).addHandler(NullHandler())
 
 __all__ = (
-    'Client',
-    'VirtualFinanceAPIError'
+    "Client",
+    "VirtualFinanceAPIError"
 )
