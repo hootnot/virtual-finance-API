@@ -14,13 +14,7 @@ The other option is to use one tof the *extensions.stdjson* request classes.
 These classes provide a standardized JSON response.
 """
 
-from .endpoints.bundle import (
-    Financials,
-    Profile,
-    Holders,
-    History,
-    Options
-)
+from .endpoints.bundle import Financials, Profile, Holders, History, Options
 from virtual_finance_api.endpoints.decorators import dyndoc_insert
 from virtual_finance_api.endpoints.business_insider import ISIN
 from virtual_finance_api.client import Client
@@ -36,7 +30,6 @@ client = None
 
 
 class Ticker:
-
     @dyndoc_insert(responses)
     def __init__(self, ticker):
         """Instantiate a Ticker instance.
@@ -70,22 +63,18 @@ class Ticker:
             {_yf_financials_earnings_resp}
 
         """
-        self._hparams = {
-            'period': '1mo',
-            'interval': '1d',
-            'actions': 'True',
-        }
+        self._hparams = {"period": "1mo", "interval": "1d", "actions": "True"}
         self._ticker = ticker
 
         # dict to hold request instances that only will we instantiated
         # in case the property is asked for
         self._r = {
-            'profile': None,
-            'financials': None,
-            'holders': None,
-            'options': None,
-            'history': None,
-            'isin': None
+            "profile": None,
+            "financials": None,
+            "holders": None,
+            "options": None,
+            "history": None,
+            "isin": None,
         }
         global client
         if client is None:
@@ -111,71 +100,129 @@ class Ticker:
             if k not in params:
                 params.update({k: self._hparams[k]})
 
-        return self._init('history', History, 'history', kwargs={'ticker': self._ticker, 'params': params})  # noqa E501
+        return self._init(
+            "history",
+            History,
+            "history",
+            kwargs={"ticker": self._ticker, "params": params},
+        )  # noqa E501
 
     @property
     def isin(self):
-        return self._init('isin', ISIN, 'response', kwargs={'params': {'query': self._ticker}})  # noqa E501
+        return self._init(
+            "isin", ISIN, "response", kwargs={"params": {"query": self._ticker}}
+        )  # noqa E501
 
     @property
     def major_holders(self):
-        return self._init('holders', Holders, 'major', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "holders", Holders, "major", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     @property
     def institutional_holders(self):
-        return self._init('holders', Holders, 'institutional', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "holders", Holders, "institutional", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     @property
     def mutualfund_holders(self):
-        return self._init('holders', Holders, 'mutualfund', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "holders", Holders, "mutualfund", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     @property
     def dividends(self):
-        return self._init('history', History, 'dividends', kwargs={'ticker': self._ticker, 'period': 'max'})  # noqa E501
+        return self._init(
+            "history",
+            History,
+            "dividends",
+            kwargs={"ticker": self._ticker, "period": "max"},
+        )  # noqa E501
 
     @property
     def splits(self):
-        return self._init('history', History, 'splits', kwargs={'ticker': self._ticker, 'period': 'max'})  # noqa E501
+        return self._init(
+            "history",
+            History,
+            "splits",
+            kwargs={"ticker": self._ticker, "period": "max"},
+        )  # noqa E501
 
     @property
     def actions(self):
-        return self._init('history', History, 'actions', kwargs={'ticker': self._ticker, 'period': 'max'})  # noqa E501
+        return self._init(
+            "history",
+            History,
+            "actions",
+            kwargs={"ticker": self._ticker, "period": "max"},
+        )  # noqa E501
 
     @property
     def info(self):
-        return self._init('profile', Profile, 'info', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "profile", Profile, "info", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     @property
     def calendar(self):
-        return self._init('profile', Profile, 'calendar', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "profile", Profile, "calendar", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     @property
     def recommendations(self):
-        return self._init('profile', Profile, 'recommendations', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "profile", Profile, "recommendations", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     @property
     def earnings(self):
-        return self._init('financials', Financials, 'earnings', kwargs={'ticker': self._ticker})['yearly']  # noqa E501
+        return self._init(
+            "financials", Financials, "earnings", kwargs={"ticker": self._ticker}
+        )[
+            "yearly"
+        ]  # noqa E501
 
     @property
     def quarterly_earnings(self):
-        return self._init('financials', Financials, 'earnings', kwargs={'ticker': self._ticker})['quarterly']  # noqa E501
+        return self._init(
+            "financials", Financials, "earnings", kwargs={"ticker": self._ticker}
+        )[
+            "quarterly"
+        ]  # noqa E501
 
     @property
     def financials(self):
-        return self._init('financials', Financials, 'financials', kwargs={'ticker': self._ticker})['yearly']  # noqa E501
+        return self._init(
+            "financials", Financials, "financials", kwargs={"ticker": self._ticker}
+        )[
+            "yearly"
+        ]  # noqa E501
 
     @property
     def quarterly_financials(self):
-        return self._init('financials', Financials, 'financials', kwargs={'ticker': self._ticker})['quarterly']  # noqa E501
+        return self._init(
+            "financials", Financials, "financials", kwargs={"ticker": self._ticker}
+        )[
+            "quarterly"
+        ]  # noqa E501
 
     @property
     def balance_sheet(self):
-        return self._init('financials', Financials, 'balancesheet', kwargs={'ticker': self._ticker})['yearly']  # noqa E501
+        return self._init(
+            "financials", Financials, "balancesheet", kwargs={"ticker": self._ticker}
+        )[
+            "yearly"
+        ]  # noqa E501
 
     @property
     def quarterly_balance_sheet(self):
-        return self._init('financials', Financials, 'balancesheet', kwargs={'ticker': self._ticker})['quarterly']  # noqa E501
+        return self._init(
+            "financials", Financials, "balancesheet", kwargs={"ticker": self._ticker}
+        )[
+            "quarterly"
+        ]  # noqa E501
 
     @property
     def balancesheet(self):
@@ -189,20 +236,34 @@ class Ticker:
 
     @property
     def cashflow(self):
-        return self._init('financials', Financials, 'cashflow', kwargs={'ticker': self._ticker})['yearly']  # noqa E501
+        return self._init(
+            "financials", Financials, "cashflow", kwargs={"ticker": self._ticker}
+        )[
+            "yearly"
+        ]  # noqa E501
 
     @property
     def quarterly_cashflow(self):
-        return self._init('financials', Financials, 'cashflow', kwargs={'ticker': self._ticker})['quarterly']  # noqa E501
+        return self._init(
+            "financials", Financials, "cashflow", kwargs={"ticker": self._ticker}
+        )[
+            "quarterly"
+        ]  # noqa E501
 
     @property
     def sustainability(self):
-        return self._init('profile', Profile, 'sustainability', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "profile", Profile, "sustainability", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     @property
     def options(self):
-        return self._init('options', Options, 'options', kwargs={'ticker': self._ticker})  # noqa E501
+        return self._init(
+            "options", Options, "options", kwargs={"ticker": self._ticker}
+        )  # noqa E501
 
     def option_chain(self, date):
-        self._init('options', Options, 'options', kwargs={'ticker': self._ticker})  # noqa E501
-        return self._r['options'].option_chain(date)
+        self._init(
+            "options", Options, "options", kwargs={"ticker": self._ticker}
+        )  # noqa E501
+        return self._r["options"].option_chain(date)

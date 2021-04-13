@@ -8,9 +8,9 @@ def camel2title(o):
 
 
 def extract_domain(url):
-    m = re.match('^.*://(?:www.|)(.*)', url)
+    m = re.match("^.*://(?:www.|)(.*)", url)
     try:
         return m.group(1)
 
     except IndexError:
-        return ''
+        return ""

@@ -1,4 +1,5 @@
 import unittest
+
 # from .unittestsetup import environment as environment
 from .unittestsetup import fetchTestData, fetchRawData
 import requests_mock
@@ -14,13 +15,13 @@ except Exception as err:  # noqa F841
 from virtual_finance_api.client import Client
 from virtual_finance_api.exceptions import (  # noqa F401
     ConversionHookError,
-    VirtualFinanceAPIError
+    VirtualFinanceAPIError,
 )
 from virtual_finance_api.endpoints.yahoo.screener_bundle import responses
 import virtual_finance_api.endpoints.yahoo as yhe
 
 client = None
-API_URL = 'https://test.com'
+API_URL = "https://test.com"
 
 
 class TestScreener_bundle(unittest.TestCase):
@@ -42,12 +43,10 @@ class TestScreener_bundle(unittest.TestCase):
         """get the screener output."""
         tid = "_predefined_screener"
         resp, data = fetchTestData(responses, tid)
-        r = yhe.Screener('MOST_SHORTED_STOCKS')
+        r = yhe.Screener("MOST_SHORTED_STOCKS")
         r.DOMAIN = API_URL
-        rawdata = fetchRawData('screener.raw')
-        mock_req.register_uri('GET',
-                              "{}/{}".format(API_URL, r),
-                              text=rawdata)
+        rawdata = fetchRawData("screener.raw")
+        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=rawdata)
         result = client.request(r)
         self.assertTrue(str(result) == str(resp))
 
@@ -56,13 +55,13 @@ class TestScreener_bundle(unittest.TestCase):
         """get the screener output."""
         tid = "_predefined_screener"
         resp, data = fetchTestData(responses, tid)
-        r = yhe.Screener('MOST_SHORTED_STOCKS')
+        r = yhe.Screener("MOST_SHORTED_STOCKS")
         r.DOMAIN = API_URL
-        rawdata = fetchRawData('screener.raw')
+        rawdata = fetchRawData("screener.raw")
 
-        mock_req.register_uri('GET',
-                              "{}/{}".format(API_URL, r),
-                              text=rawdata.replace('store', 'erots'))
+        mock_req.register_uri(
+            "GET", "{}/{}".format(API_URL, r), text=rawdata.replace("store", "erots")
+        )
         with self.assertRaises(VirtualFinanceAPIError) as cErr:
             client.request(r)
         self.assertTrue(422, cErr.exception.code)
@@ -75,10 +74,8 @@ class TestScreener_bundle(unittest.TestCase):
         resp, data = fetchTestData(responses, tid)
         r = yhe.Screeners()
         r.DOMAIN = API_URL
-        rawdata = fetchRawData('screeners.raw')
-        mock_req.register_uri('GET',
-                              "{}/{}".format(API_URL, r),
-                              text=rawdata)
+        rawdata = fetchRawData("screeners.raw")
+        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=rawdata)
         result = None
         result = client.request(r)
         self.assertTrue(result == resp)
@@ -91,10 +88,10 @@ class TestScreener_bundle(unittest.TestCase):
         resp, data = fetchTestData(responses, tid)
         r = yhe.Screeners()
         r.DOMAIN = API_URL
-        rawdata = fetchRawData('screeners.raw')
-        mock_req.register_uri('GET',
-                              "{}/{}".format(API_URL, r),
-                              text=rawdata.replace('Store', 'WTF'))
+        rawdata = fetchRawData("screeners.raw")
+        mock_req.register_uri(
+            "GET", "{}/{}".format(API_URL, r), text=rawdata.replace("Store", "WTF")
+        )
         cErr = None
         with self.assertRaises(VirtualFinanceAPIError) as cErr:
             client.request(r)

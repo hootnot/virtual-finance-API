@@ -1,7 +1,7 @@
 import unittest
 from virtual_finance_api.exceptions import (  # noqa F401
     ConversionHookError,
-    VirtualFinanceAPIError
+    VirtualFinanceAPIError,
 )
 from virtual_finance_api.generic import isin
 
@@ -15,7 +15,7 @@ except Exception as err:  # noqa F841
 
 
 client = None
-API_URL = 'https://test.com'
+API_URL = "https://test.com"
 
 
 class TestGeneric(unittest.TestCase):
@@ -35,19 +35,26 @@ class TestGeneric(unittest.TestCase):
 
     def test__isin(self):
         """ISINCode."""
-        ic = isin.ISINCode('BE0003788057')
-        self.assertTrue(ic.country == 'BE' and
-                        ic.NSIN == '000378805' and
-                        ic.code == 'BE0003788057' and
-                        ic.passed is True and
-                        str(ic) == str({'ISIN': 'BE0003788057',
-                                        'COUNTRY': 'BE',
-                                        'NSIN': '000378805',
-                                        'CHKSUM': True}))
+        ic = isin.ISINCode("BE0003788057")
+        self.assertTrue(
+            ic.country == "BE"
+            and ic.NSIN == "000378805"
+            and ic.code == "BE0003788057"
+            and ic.passed is True
+            and str(ic)
+            == str(
+                {
+                    "ISIN": "BE0003788057",
+                    "COUNTRY": "BE",
+                    "NSIN": "000378805",
+                    "CHKSUM": True,
+                }
+            )
+        )
 
     def test__isin_err(self):
         """ISINCode."""
-        code = 'E0003788057'
+        code = "E0003788057"
         with self.assertRaises(ValueError) as err:
             isin.ISINCode(code)
         self.assertTrue(code in str(err.exception))

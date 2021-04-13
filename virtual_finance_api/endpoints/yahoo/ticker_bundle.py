@@ -41,7 +41,7 @@ class Yhoo(APIRequest):
         return self._ticker
 
 
-@endpoint('quote/{ticker}/financials', domain='https://finance.yahoo.com')
+@endpoint("quote/{ticker}/financials", domain="https://finance.yahoo.com")
 class Financials(VirtualAPIRequest, Yhoo):
     """Financials - class to handle the financials endpoint."""
 
@@ -79,7 +79,7 @@ class Financials(VirtualAPIRequest, Yhoo):
 
         except Exception as err:  # noqa F841
             # let the client deal with the error
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
@@ -87,8 +87,11 @@ class Financials(VirtualAPIRequest, Yhoo):
 
 
 # @endpoint('v7/finance/download/{ticker}')   # 7 or 8 ?
-@endpoint('v8/finance/chart/{ticker}', response_type='json',
-          domain='https://query1.finance.yahoo.com')
+@endpoint(
+    "v8/finance/chart/{ticker}",
+    response_type="json",
+    domain="https://query1.finance.yahoo.com",
+)
 class History(VirtualAPIRequest, Yhoo):
     """History - class to handle the history endpoint."""
 
@@ -116,14 +119,14 @@ class History(VirtualAPIRequest, Yhoo):
         except Exception as err:
             # let the client deal with the error
             logger.error(err)
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
             return rv
 
 
-@endpoint('quote/{ticker}/holders', domain='https://finance.yahoo.com')
+@endpoint("quote/{ticker}/holders", domain="https://finance.yahoo.com")
 class Holders(VirtualAPIRequest, Yhoo):
     """Holders - class to handle the holders endpoint."""
 
@@ -160,7 +163,7 @@ class Holders(VirtualAPIRequest, Yhoo):
 
         try:
             data = pd.read_html(s)
-            for i, k in enumerate(['major', 'institutional', 'mutualfund']):
+            for i, k in enumerate(["major", "institutional", "mutualfund"]):
                 logger.debug("conversion_hook: %s", k)
                 try:
                     response.update({k: json.loads(data[i].to_json())})
@@ -171,16 +174,18 @@ class Holders(VirtualAPIRequest, Yhoo):
 
         except Exception as err:  # noqa F841
             # let the client deal with a 'fatal' error
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
             return response
 
 
-@endpoint('v7/finance/options/{ticker}',
-          domain='https://query1.finance.yahoo.com',
-          response_type='json')
+@endpoint(
+    "v7/finance/options/{ticker}",
+    domain="https://query1.finance.yahoo.com",
+    response_type="json",
+)
 class Options(VirtualAPIRequest, Yhoo):
     """Options - class to handle the options endpoint."""
 
@@ -212,7 +217,7 @@ class Options(VirtualAPIRequest, Yhoo):
 
         """
         super(Options, self).__init__(ticker)
-        self.params = {'p': ticker}
+        self.params = {"p": ticker}
 
         if params is not None:
             self.params.update(**params)
@@ -223,14 +228,14 @@ class Options(VirtualAPIRequest, Yhoo):
 
         except Exception as err:  # noqa F841
             # let the client deal with the error
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
             return rv
 
 
-@endpoint('quote/{ticker}', domain='https://finance.yahoo.com')
+@endpoint("quote/{ticker}", domain="https://finance.yahoo.com")
 class Profile(VirtualAPIRequest, Yhoo):
     """Profile - class to handle the profile endpoint."""
 
@@ -267,7 +272,7 @@ class Profile(VirtualAPIRequest, Yhoo):
 
         except Exception as err:  # noqa F841
             # let the client deal with the error
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)

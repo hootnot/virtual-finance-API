@@ -2,6 +2,4 @@
 
 from .ticker import Ticker  # noqa F401
 
-__all__ = (
-    'Ticker',
-)
+__all__ = ("Ticker",)

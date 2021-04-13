@@ -25,7 +25,4 @@ except ImportError:
 
 logging.getLogger(__name__).addHandler(NullHandler())
 
-__all__ = (
-    "Client",
-    "VirtualFinanceAPIError"
-)
+__all__ = ("Client", "VirtualFinanceAPIError")

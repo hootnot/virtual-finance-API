@@ -7,8 +7,7 @@ from .responses.isin import responses
 from virtual_finance_api.generic.isin import ISINCode
 
 
-@endpoint('ajax/SearchController_Suggest',
-          domain='https://markets.businessinsider.com')
+@endpoint("ajax/SearchController_Suggest", domain="https://markets.businessinsider.com")
 class ISIN(VirtualAPIRequest):
     """ISIN - class to handle the ISIN endpoint."""
 
@@ -45,35 +44,35 @@ class ISIN(VirtualAPIRequest):
         """
         endpoint = self.ENDPOINT
         super(ISIN, self).__init__(endpoint, method=self.METHOD)
-        self.params = {'max_results': 25}
-        if 'query' not in params:
+        self.params = {"max_results": 25}
+        if "query" not in params:
             raise ValueError("Missing in 'params': 'query'")
 
         self.params.update(**params)
 
     def _conversion_hook(self, response):
-        ticker = self.params.get('query')
+        ticker = self.params.get("query")
         lookup = "{}|".format(ticker)
 
-        rv = {
-            "ticker": self.params['query'],
-        }
+        rv = {"ticker": self.params["query"]}
 
         if lookup not in response:
             lookup = '"|'
-            if ticker.lower() not in response.lower() or lookup not in response:  # noqa E501
+            if (
+                ticker.lower() not in response.lower() or lookup not in response
+            ):  # noqa E501
                 # raise a NOT FOUND status
-                raise ConversionHookError(404, 'ISIN not found')
+                raise ConversionHookError(404, "ISIN not found")
 
         else:
-            v = response.split(lookup)[1].split('"')[0].split('|')[0]
+            v = response.split(lookup)[1].split('"')[0].split("|")[0]
             try:
                 _isin = ISINCode(v)
 
             except ValueError as err:  # noqa F841
-                raise ConversionHookError(422, 'Unprocessable Entity')
+                raise ConversionHookError(422, "Unprocessable Entity")
 
             else:
-                rv.update({'ISIN': _isin.code})
+                rv.update({"ISIN": _isin.code})
 
         return rv

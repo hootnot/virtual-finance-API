@@ -66,25 +66,28 @@ class Financials(yhe.Financials):
         try:
 
             for repgroup in (
-                ('cashflow', 'cashflowStatement', 'cashflowStatements'),
-                ('balancesheet', 'balanceSheet', 'balanceSheetStatements'),
-                ('financials', 'incomeStatement', 'incomeStatementHistory')
+                ("cashflow", "cashflowStatement", "cashflowStatements"),
+                ("balancesheet", "balanceSheet", "balanceSheetStatements"),
+                ("financials", "incomeStatement", "incomeStatementHistory"),
             ):
                 attr, subject, details = repgroup
-                for itemDetail, key in [('', 'yearly'), ('Quarterly', 'quarterly')]:  # noqa E501
-                    item = f'{subject}History{itemDetail}'
+                for itemDetail, key in [
+                    ("", "yearly"),
+                    ("Quarterly", "quarterly"),
+                ]:  # noqa E501
+                    item = f"{subject}History{itemDetail}"
                     if isinstance(data.get(item), dict):
                         if attr not in _resp:
                             _resp.update({attr: {}})
                         _resp[attr].update({key: data[item][details]})
 
             # earnings
-            if data.get('earnings', None):
-                _resp.update({'earnings': data['earnings']['financialsChart']})
+            if data.get("earnings", None):
+                _resp.update({"earnings": data["earnings"]["financialsChart"]})
 
         except Exception as err:
             logger.error(err)
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             return _resp
@@ -130,34 +133,38 @@ class Holders(yhe.Holders):
             }
 
         """
+
         def normalize(data, K):
             _record = {}
             _legend = {}
             for k, v in data[K].items():
-                _k = k.lower().replace(' ', '_').replace('%', 'pch')
+                _k = k.lower().replace(" ", "_").replace("%", "pch")
                 if _k not in _legend:
                     _legend.update({_k: k})
                 for i, (kk, vv) in enumerate(v.items()):
                     if i not in _record:
                         _record.update({i: {}})
-                    if isinstance(vv, (str,)) and '%' in vv:
-                        vv = float(vv.replace('%', ''))
+                    if isinstance(vv, (str,)) and "%" in vv:
+                        vv = float(vv.replace("%", ""))
                     _record[i].update({_k: vv})
 
-            return {
-                    'legend': _legend,
-                    'holders': list(_record.values())
-            }
+            return {"legend": _legend, "holders": list(_record.values())}
 
         data = super(Holders, self)._conversion_hook(s)
         _resp = {}
 
         try:
-            _resp.update({
-                'major':
-                [list(l) for l in zip(data['major']['0'].values(), data['major']['1'].values())]  # noqa E501
-            })
-            for k in ['institutional', 'mutualfund']:
+            _resp.update(
+                {
+                    "major": [
+                        list(l)
+                        for l in zip(
+                            data["major"]["0"].values(), data["major"]["1"].values()
+                        )
+                    ]  # noqa E501
+                }
+            )
+            for k in ["institutional", "mutualfund"]:
                 try:
                     ndd = normalize(data, k)
 
@@ -171,7 +178,7 @@ class Holders(yhe.Holders):
 
         except Exception as err:
             logger.error(err)
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             return _resp
@@ -232,38 +239,43 @@ class Profile(yhe.Profile):
         def info(response):
             rv = {}
             SECTIONS = [
-                    'summaryProfile', 'summaryDetail', 'quoteType',
-                    'defaultKeyStatistics', 'assetProfile', 'summaryDetail']
+                "summaryProfile",
+                "summaryDetail",
+                "quoteType",
+                "defaultKeyStatistics",
+                "assetProfile",
+                "summaryDetail",
+            ]
             for section in SECTIONS:
                 if section in response:
                     rv.update(response[section])
 
-            rv['regularMarketPrice'] = rv['regularMarketOpen']
-            rv['logo_url'] = ""
-            domain = extract_domain(rv['website'])
+            rv["regularMarketPrice"] = rv["regularMarketOpen"]
+            rv["logo_url"] = ""
+            domain = extract_domain(rv["website"])
             if domain:
-                rv['logo_url'] = f'https://logo.clearbit.com/{domain}'
+                rv["logo_url"] = f"https://logo.clearbit.com/{domain}"
 
             return rv
 
         def recommendations(response):
-            return response['upgradeDowngradeHistory']['history']
+            return response["upgradeDowngradeHistory"]["history"]
 
         def calendar(response):
-            return response['calendarEvents']
+            return response["calendarEvents"]
 
         def sustainability(response):
-            return response['esgScores']
+            return response["esgScores"]
 
         try:
-            resp.update({'info': info(data)})
-            resp.update({'recommendations': recommendations(data)})
-            resp.update({'calendar': calendar(data)})
-            resp.update({'sustainability': sustainability(data)})
+            resp.update({"info": info(data)})
+            resp.update({"recommendations": recommendations(data)})
+            resp.update({"calendar": calendar(data)})
+            resp.update({"sustainability": sustainability(data)})
 
         except Exception as err:
             logger.error(err)
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             return resp
@@ -305,13 +317,18 @@ class Options(yhe.Options):
 
         resp = {}
         try:
-            for attr in ['underlyingSymbol', 'expirationDates', 'strikes',
-                         'hasMiniOptions', 'options']:
-                resp.update({attr: data['optionChain']['result'][0][attr]})
+            for attr in [
+                "underlyingSymbol",
+                "expirationDates",
+                "strikes",
+                "hasMiniOptions",
+                "options",
+            ]:
+                resp.update({attr: data["optionChain"]["result"][0][attr]})
 
         except Exception as err:
             logger.error(err)
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             return resp
@@ -352,8 +369,12 @@ class History(yhe.History):
 
         """
         super(History, self).__init__(ticker, params=hprocopt(**params))
-        logger.info("%s instantiated, ticker: %s, params: %s",
-                    self.__class__.__name__, self.ticker, self.params)
+        logger.info(
+            "%s instantiated, ticker: %s, params: %s",
+            self.__class__.__name__,
+            self.ticker,
+            self.params,
+        )
 
     def _conversion_hook(self, resp):
         """call the conversionhook of the parent class to get our data
@@ -387,7 +408,9 @@ class History(yhe.History):
                ]
             """
             try:
-                res = [d[cat][str(k)] for k in sorted(int(dt) for dt in d[cat].keys())]  # noqa E501
+                res = [
+                    d[cat][str(k)] for k in sorted(int(dt) for dt in d[cat].keys())
+                ]  # noqa E501
 
             except Exception as err:  # noqa F841
                 logger.info("no data for: cat %s", cat)
@@ -410,21 +433,26 @@ class History(yhe.History):
                            'close': [...],
                            'volume': [...]}
             """
-            if adjustType == 'auto':
-                num, denom = 'close', 'adjclose'
+            if adjustType == "auto":
+                num, denom = "close", "adjclose"
 
-            elif adjustType == 'backadjust':
-                num, denom = 'adjclose', 'close'
+            elif adjustType == "backadjust":
+                num, denom = "adjclose", "close"
 
             else:
-                logger.warning('adjust: None')
+                logger.warning("adjust: None")
                 return ohlcdata
 
-            ratio = [ohlcdata[num][i] / ohlcdata[denom][i] for i in range(len(ohlcdata['close']))]  # noqa E501
+            ratio = [
+                ohlcdata[num][i] / ohlcdata[denom][i]
+                for i in range(len(ohlcdata["close"]))
+            ]  # noqa E501
 
-            ohlcdata['close'] = ohlcdata['adjclose']
-            for qc in ['open', 'high', 'low']:
-                ohlcdata[qc] = [ohlcdata[qc][i] / ratio[i] for i in range(len(ohlcdata['close']))]  # noqa E501
+            ohlcdata["close"] = ohlcdata["adjclose"]
+            for qc in ["open", "high", "low"]:
+                ohlcdata[qc] = [
+                    ohlcdata[qc][i] / ratio[i] for i in range(len(ohlcdata["close"]))
+                ]  # noqa E501
 
             return ohlcdata
 
@@ -433,34 +461,40 @@ class History(yhe.History):
         tdata = {}
 
         try:
-            _data = data['chart']['result'][0]
-            tdata.update({'meta': _data['meta']})
-            tdata.update({'ohlcdata': {}})
-            tdata['ohlcdata'].update({'timestamp': _data['timestamp']})
-            tdata['ohlcdata'].update(_data['indicators']['quote'][0])
-            tdata['ohlcdata'].update(_data['indicators']['adjclose'][0])
-            if 'events' in _data:
-                for cat in ['dividends', 'splits']:
+            _data = data["chart"]["result"][0]
+            tdata.update({"meta": _data["meta"]})
+            tdata.update({"ohlcdata": {}})
+            tdata["ohlcdata"].update({"timestamp": _data["timestamp"]})
+            tdata["ohlcdata"].update(_data["indicators"]["quote"][0])
+            tdata["ohlcdata"].update(_data["indicators"]["adjclose"][0])
+            if "events" in _data:
+                for cat in ["dividends", "splits"]:
                     try:
-                        tdata.update({cat: _ordered_timeitems(_data['events'], cat)})  # noqa E501
+                        tdata.update(
+                            {cat: _ordered_timeitems(_data["events"], cat)}
+                        )  # noqa E501
 
                     except Exception as err:
-                        logger.warning("no events for %s cat: %s [%s]",
-                                       self.ticker, cat, err)
+                        logger.warning(
+                            "no events for %s cat: %s [%s]", self.ticker, cat, err
+                        )
 
                     else:
-                        logger.info("added: %s cat: %s, #%s",
-                                    self.ticker, cat, len(tdata[cat]))
+                        logger.info(
+                            "added: %s cat: %s, #%s", self.ticker, cat, len(tdata[cat])
+                        )
 
             # adjust data ?
-            _pAdjust = self.params.get('adjust', None)
+            _pAdjust = self.params.get("adjust", None)
             if _pAdjust:
-                logger.info('adjust: %s %s', self.ticker, _pAdjust)
-                tdata['ohlcdata'] = adjust(tdata['ohlcdata'], adjustType=_pAdjust)  # noqa E501
+                logger.info("adjust: %s %s", self.ticker, _pAdjust)
+                tdata["ohlcdata"] = adjust(
+                    tdata["ohlcdata"], adjustType=_pAdjust
+                )  # noqa E501
 
         except Exception as err:
             logger.error(err)
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
             return tdata

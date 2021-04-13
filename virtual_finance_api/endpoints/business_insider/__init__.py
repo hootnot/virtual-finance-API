@@ -2,6 +2,4 @@
 
 from .isin import ISIN  # noqa F401
 
-__all__ = (
-    'ISIN',
-)
+__all__ = ("ISIN",)

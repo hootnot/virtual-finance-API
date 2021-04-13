@@ -8,21 +8,15 @@ try:
 except ImportError as err:  # noqa F841
     import json
 
-from .exceptions import (
-    VirtualFinanceAPIError,
-    ConversionHookError
-)
+from .exceptions import VirtualFinanceAPIError, ConversionHookError
 from .endpoints.apirequest import VirtualAPIRequest
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_HEADERS = {
-    "Accept-Encoding": "gzip, deflate"
-}
+DEFAULT_HEADERS = {"Accept-Encoding": "gzip, deflate"}
 
 
 class Client:
-
     def __init__(self, headers=None, request_params=None):
         """Instantiate a Client instance.
 
@@ -109,10 +103,10 @@ class Client:
             headers = getattr(endpoint, "HEADERS")
 
         request_args = {}
-        if method == 'get':
-            request_args['params'] = params
+        if method == "get":
+            request_args["params"] = params
         elif hasattr(endpoint, "data") and endpoint.data:
-            request_args['json'] = endpoint.data
+            request_args["json"] = endpoint.data
 
         # if any parameter for request then merge them
         request_args.update(self._request_params)
@@ -131,12 +125,13 @@ class Client:
             # in case of a virtual request:
             # process the primary response into the desired response
             # by calling the _conversion_hook
-            if hasattr(endpoint, '_conversion_hook'):
+            if hasattr(endpoint, "_conversion_hook"):
                 # only allow _conversion_hook for VirtualAPIRequest instances
                 assert isinstance(endpoint, VirtualAPIRequest)
                 try:
                     content = endpoint._conversion_hook(
-                            response.content.decode('utf-8'))
+                        response.content.decode("utf-8")
+                    )
 
                 except ConversionHookError as err:
                     logger.error("%s: conversion error: %s", endpoint, err)
@@ -160,26 +155,30 @@ class Client:
 
         # Handle error responses
         if response.status_code >= 400:
-            logger.error("request %s failed [%d,%s]",
-                         url,
-                         response.status_code,
-                         response.content.decode('utf-8'))
-            raise VirtualFinanceAPIError(response.status_code,
-                                         response.content.decode('utf-8'))
+            logger.error(
+                "request %s failed [%d,%s]",
+                url,
+                response.status_code,
+                response.content.decode("utf-8"),
+            )
+            raise VirtualFinanceAPIError(
+                response.status_code, response.content.decode("utf-8")
+            )
 
         if content is None:
-            content = response.content.decode('utf-8')
+            content = response.content.decode("utf-8")
         endpoint.status_code = response.status_code
 
-        if endpoint.RESPONSE_TYPE == 'json':
+        if endpoint.RESPONSE_TYPE == "json":
             try:
                 if isinstance(content, str):
                     content = json.loads(content)
 
             except Exception as err:
                 logger.error("Error loading JSON response ... %s", err)
-                raise ValueError(f"request: {endpoint}, "
-                                 "response could not be loaded as JSON")
+                raise ValueError(
+                    f"request: {endpoint}, " "response could not be loaded as JSON"
+                )
 
             # else:
             #   if not isinstance(content, (list, dict)):

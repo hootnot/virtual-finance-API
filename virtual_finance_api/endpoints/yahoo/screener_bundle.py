@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@endpoint('screener/predefined/{name}', domain='https://finance.yahoo.com')
+@endpoint("screener/predefined/{name}", domain="https://finance.yahoo.com")
 class Screener(VirtualAPIRequest):
     """Screener - class to handle the screener endpoint."""
 
@@ -42,19 +42,19 @@ class Screener(VirtualAPIRequest):
     def _conversion_hook(self, s):
         rv = None
         try:
-            rv = get_store(s, 'ScreenerResultsStore')['results']
+            rv = get_store(s, "ScreenerResultsStore")["results"]
 
         except Exception as err:  # noqa F841
             # let the client deal with the error
             logger.error("ConversionHookError: %s", err)
-            raise ConversionHookError(422, 'Unprocessable Entity')
+            raise ConversionHookError(422, "Unprocessable Entity")
 
         else:
             logger.info("%s conversion_hook: OK", self.__class__.__name__)
             return rv
 
 
-@endpoint('screener', domain='https://finance.yahoo.com')
+@endpoint("screener", domain="https://finance.yahoo.com")
 class Screeners(VirtualAPIRequest):
     """Screeners - class to handle the screeners endpoint."""
 
@@ -82,9 +82,9 @@ class Screeners(VirtualAPIRequest):
 
     def _conversion_hook(self, s):
         rv = []
-        ATTRS = ['title', 'predefinedScr', 'description', 'canonicalName']
+        ATTRS = ["title", "predefinedScr", "description", "canonicalName"]
         try:
-            for M in get_store(s, 'ScreenerStore')['predefinedList']:
+            for M in get_store(s, "ScreenerStore")["predefinedList"]:
                 d = {}
                 for attr in ATTRS:
                     d.update({attr: M[attr]})
@@ -92,8 +92,8 @@ class Screeners(VirtualAPIRequest):
 
         except Exception as err:  # noqa F841
             # let the client deal with the error
-            raise ConversionHookError(422, 'Unprocessable Entity')
+            raise ConversionHookError(422, "Unprocessable Entity")
 
         else:
             logger.info("%s conversion_hook: OK", self.__class__.__name__)
-            return {'screeners': rv}
+            return {"screeners": rv}

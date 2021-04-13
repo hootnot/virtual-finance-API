@@ -70,7 +70,7 @@ class Financials(yhe.Financials):
         self._financials = {"yearly": None, "quarterly": None}
 
     def _processed(self, attr):
-        return attr['yearly'] is not None and attr['quarterly'] is not None
+        return attr["yearly"] is not None and attr["quarterly"] is not None
 
     @property
     def earnings(self):
@@ -97,41 +97,45 @@ class Financials(yhe.Financials):
         return self._financials
 
     def _extract(self):
-
         def mk_dataframe(data):
-            df = pd.DataFrame(data).drop(columns=['maxAge'])
+            df = pd.DataFrame(data).drop(columns=["maxAge"])
             for col in df.columns:
-                df[col] = np.where(df[col].astype(str) == '-', np.nan, df[col])
+                df[col] = np.where(df[col].astype(str) == "-", np.nan, df[col])
 
-            df.set_index('endDate', inplace=True)
+            df.set_index("endDate", inplace=True)
             try:
-                df.index = pd.to_datetime(df.index, unit='s')
+                df.index = pd.to_datetime(df.index, unit="s")
 
             except ValueError:
                 df.index = pd.to_datetime(df.index)
             df = df.T
-            df.columns.name = ''
-            df.index.name = 'Breakdown'
+            df.columns.name = ""
+            df.index.name = "Breakdown"
 
             df.index = camel2title(df.index)
             return df
 
         for repgroup in (
-            ('_cashflow', 'cashflowStatement', 'cashflowStatements'),
-            ('_balancesheet', 'balanceSheet', 'balanceSheetStatements'),
-            ('_financials', 'incomeStatement', 'incomeStatementHistory')
+            ("_cashflow", "cashflowStatement", "cashflowStatements"),
+            ("_balancesheet", "balanceSheet", "balanceSheetStatements"),
+            ("_financials", "incomeStatement", "incomeStatementHistory"),
         ):
             attr, subject, details = repgroup
-            for itemDetail, key in [('', 'yearly'), ('Quarterly', 'quarterly')]:  # noqa E501
-                item = f'{subject}History{itemDetail}'
+            for itemDetail, key in [
+                ("", "yearly"),
+                ("Quarterly", "quarterly"),
+            ]:  # noqa E501
+                item = f"{subject}History{itemDetail}"
                 if isinstance(self.response.get(item), dict):
-                    getattr(self, attr)[key] = mk_dataframe(self.response[item][details])  # noqa E501
+                    getattr(self, attr)[key] = mk_dataframe(
+                        self.response[item][details]
+                    )  # noqa E501
 
         # earnings
-        if isinstance(self.response.get('earnings'), dict):
-            earnings = self.response['earnings']['financialsChart']
-            for key, title in [('yearly', 'Year'), ('quarterly', 'Quarter')]:
-                df = pd.DataFrame(earnings[key]).set_index('date')
+        if isinstance(self.response.get("earnings"), dict):
+            earnings = self.response["earnings"]["financialsChart"]
+            for key, title in [("yearly", "Year"), ("quarterly", "Quarter")]:
+                df = pd.DataFrame(earnings[key]).set_index("date")
                 df.columns = camel2title(df.columns)
                 df.index.name = title
                 self._earnings[key] = df
@@ -185,15 +189,15 @@ class Holders(yhe.Holders):
 
     @property
     def institutional(self):
-        return self._holders_by_type('institutional')
+        return self._holders_by_type("institutional")
 
     @property
     def mutualfund(self):
-        return self._holders_by_type('mutualfund')
+        return self._holders_by_type("mutualfund")
 
     @property
     def major(self):
-        return self._holders_by_type('major')
+        return self._holders_by_type("major")
 
     def _extract(self):
         self._holders = {}
@@ -201,21 +205,37 @@ class Holders(yhe.Holders):
             self._holders.update({k: pd.DataFrame(v)})
 
         for k, df in self._holders.items():
-            if 'Date Reported' in df:
-                self._holders[k]['Date Reported'] = pd.to_datetime(df['Date Reported'])  # noqa E501
-            if '% Out' in df:
-                self._holders[k]['% Out'] = df['% Out'].str.replace('%', '').astype(float) / 100  # noqa E501
+            if "Date Reported" in df:
+                self._holders[k]["Date Reported"] = pd.to_datetime(
+                    df["Date Reported"]
+                )  # noqa E501
+            if "% Out" in df:
+                self._holders[k]["% Out"] = (
+                    df["% Out"].str.replace("%", "").astype(float) / 100
+                )  # noqa E501
 
 
 class Profile(yhe.Profile):
 
     """Profile - class to handle the profile endpoint."""
 
-    COMPONENTS = ['defaultKeyStatistics', 'details', 'summaryProfile',
-                  'recommendationTrend', 'financialsTemplate',
-                  'earnings', 'price', 'financialData', 'quoteType',
-                  'calendarEvents', 'summaryDetail', 'symbol',
-                  'esgScores', 'upgradeDowngradeHistory', 'pageViews']
+    COMPONENTS = [
+        "defaultKeyStatistics",
+        "details",
+        "summaryProfile",
+        "recommendationTrend",
+        "financialsTemplate",
+        "earnings",
+        "price",
+        "financialData",
+        "quoteType",
+        "calendarEvents",
+        "summaryDetail",
+        "symbol",
+        "esgScores",
+        "upgradeDowngradeHistory",
+        "pageViews",
+    ]
 
     @dyndoc_insert(responses)
     def __init__(self, ticker):
@@ -268,30 +288,31 @@ class Profile(yhe.Profile):
     def Sustainability(self, r):
         d = {}
         try:
-            for item in r.response['esgScores']:
-                if not isinstance(r.response['esgScores'][item], (dict, list)):
-                    d[item] = r.response['esgScores'][item]
+            for item in r.response["esgScores"]:
+                if not isinstance(r.response["esgScores"][item], (dict, list)):
+                    d[item] = r.response["esgScores"][item]
 
             s = pd.DataFrame(index=[0], data=d)[-1:].T
-            s.columns = ['Value']
-            s.index.name = '{:.0f}-{:.0f}'.format(
-                s[s.index == 'ratingYear']['Value'].values[0],
-                s[s.index == 'ratingMonth']['Value'].values[0])
+            s.columns = ["Value"]
+            s.index.name = "{:.0f}-{:.0f}".format(
+                s[s.index == "ratingYear"]["Value"].values[0],
+                s[s.index == "ratingMonth"]["Value"].values[0],
+            )
 
         except Exception as err:
             logger.warning(err)
             return None
 
         else:
-            return s[~s.index.isin(['maxAge', 'ratingYear', 'ratingMonth'])]
+            return s[~s.index.isin(["maxAge", "ratingYear", "ratingMonth"])]
 
     def Calendar(self, r):
         try:
-            df = pd.DataFrame(r.response['calendarEvents']['earnings'])
-            df['earningsDate'] = pd.to_datetime(df['earningsDate'], unit='s')
+            df = pd.DataFrame(r.response["calendarEvents"]["earnings"])
+            df["earningsDate"] = pd.to_datetime(df["earningsDate"], unit="s")
             df = df.T
             df.index = camel2title(df.index)
-            df.columns = ['Value' for c in range(len(df.columns))]
+            df.columns = ["Value" for c in range(len(df.columns))]
 
         except Exception as err:
             logger.warning(err)
@@ -301,11 +322,11 @@ class Profile(yhe.Profile):
 
     def Recommendations(self, r):
         try:
-            df = pd.DataFrame(r.response['upgradeDowngradeHistory']['history'])
-            df['Date'] = pd.to_datetime(df['epochGradeDate'], unit='s')
-            df.set_index('Date', inplace=True)
+            df = pd.DataFrame(r.response["upgradeDowngradeHistory"]["history"])
+            df["Date"] = pd.to_datetime(df["epochGradeDate"], unit="s")
+            df.set_index("Date", inplace=True)
             df.columns = camel2title(df.columns)
-            df = df[['Firm', 'To Grade', 'From Grade', 'Action']].sort_index()
+            df = df[["Firm", "To Grade", "From Grade", "Action"]].sort_index()
 
         except Exception as err:
             logger.warning("Recommendations: %s", err)
@@ -315,17 +336,23 @@ class Profile(yhe.Profile):
 
     def Info(self, r):
         rv = {}
-        SECTIONS = ['summaryProfile', 'summaryDetail', 'quoteType',
-                    'defaultKeyStatistics', 'assetProfile', 'summaryDetail']
+        SECTIONS = [
+            "summaryProfile",
+            "summaryDetail",
+            "quoteType",
+            "defaultKeyStatistics",
+            "assetProfile",
+            "summaryDetail",
+        ]
         for section in SECTIONS:
             if isinstance(r.response.get(section), dict):
                 rv.update(r.response[section])
 
-        rv['regularMarketPrice'] = rv['regularMarketOpen']
-        rv['logo_url'] = ""
-        domain = extract_domain(rv['website'])
+        rv["regularMarketPrice"] = rv["regularMarketOpen"]
+        rv["logo_url"] = ""
+        domain = extract_domain(rv["website"])
         if domain:
-            rv['logo_url'] = f'https://logo.clearbit.com/{domain}'
+            rv["logo_url"] = f"https://logo.clearbit.com/{domain}"
 
         return rv
 
@@ -370,11 +397,14 @@ class Options(yhe.Options):
         self._expirations = {}
 
     def _prep(self):
-        if self.response['optionChain']['result']:
-            for exp in self.response['optionChain']['result'][0]['expirationDates']:  # noqa E501
-                self._expirations[datetime.utcfromtimestamp(
-                    exp).strftime('%Y-%m-%d')] = exp
-            return self.response['optionChain']['result'][0]['options'][0]
+        if self.response["optionChain"]["result"]:
+            for exp in self.response["optionChain"]["result"][0][
+                "expirationDates"
+            ]:  # noqa E501
+                self._expirations[
+                    datetime.utcfromtimestamp(exp).strftime("%Y-%m-%d")
+                ] = exp
+            return self.response["optionChain"]["result"][0]["options"][0]
 
         return {}
 
@@ -386,25 +416,26 @@ class Options(yhe.Options):
 
     def _options2df(self, opt, tz):
         COLUMNS = [
-            'contractSymbol',
-            'lastTradeDate',
-            'strike',
-            'lastPrice',
-            'bid',
-            'ask',
-            'change',
-            'percentChange',
-            'volume',
-            'openInterest',
-            'impliedVolatility',
-            'inTheMoney',
-            'contractSize',
-            'currency']
+            "contractSymbol",
+            "lastTradeDate",
+            "strike",
+            "lastPrice",
+            "bid",
+            "ask",
+            "change",
+            "percentChange",
+            "volume",
+            "openInterest",
+            "impliedVolatility",
+            "inTheMoney",
+            "contractSize",
+            "currency",
+        ]
         df = pd.DataFrame(opt).reindex(columns=COLUMNS)
-        df['lastTradeDate'] = pd.to_datetime(df['lastTradeDate'], unit='s')
+        df["lastTradeDate"] = pd.to_datetime(df["lastTradeDate"], unit="s")
 
         if tz is not None:
-            df['lastTradeDate'] = df['lastTradeDate'].tz_localize(tz)
+            df["lastTradeDate"] = df["lastTradeDate"].tz_localize(tz)
 
         return df
 
@@ -414,19 +445,24 @@ class Options(yhe.Options):
 
         if date not in self._expirations:
             raise ValueError(
-                    "Expiration '{}' cannot be found. "
-                    "Available expiration are: [{}]".format(
-                        date, ', '.join(self._expirations)))
+                "Expiration '{}' cannot be found. "
+                "Available expiration are: [{}]".format(
+                    date, ", ".join(self._expirations)
+                )
+            )
 
         date = self._expirations[date]
 
-        return namedtuple('Options', ['calls', 'puts'])(**{
-            "calls": self._options2df(self._option_series['calls'], tz=tz),
-            "puts": self._options2df(self._option_series['puts'], tz=tz)
-        })
+        return namedtuple("Options", ["calls", "puts"])(
+            **{
+                "calls": self._options2df(self._option_series["calls"], tz=tz),
+                "puts": self._options2df(self._option_series["puts"], tz=tz),
+            }
+        )
 
 
 # =================
+
 
 def parse_actions(data, atype, tz):
     df = None
@@ -441,15 +477,25 @@ def parse_actions(data, atype, tz):
     return df
 
 
-def hprocopt(period="1mo", interval="1d", start=None, end=None, prepost=False,
-             actions=True, auto_adjust=True, back_adjust=False, proxy=None,
-             rounding=False, tz=None, **kwargs):
-
+def hprocopt(
+    period="1mo",
+    interval="1d",
+    start=None,
+    end=None,
+    prepost=False,
+    actions=True,
+    auto_adjust=True,
+    back_adjust=False,
+    proxy=None,
+    rounding=False,
+    tz=None,
+    **kwargs,
+):
     def convtime(t):
         if isinstance(t, datetime):
             return int(time.mktime(t.timetuple()))
         else:
-            return int(time.mktime(time.strptime(str(t), '%Y-%m-%d')))
+            return int(time.mktime(time.strptime(str(t), "%Y-%m-%d")))
 
     if auto_adjust and back_adjust:
         raise ValueError("auto/back adjust are mutually exclusive")
@@ -532,14 +578,18 @@ class History(yhe.History):
 
         """
         super(History, self).__init__(ticker, params=hprocopt(**params))
-        logger.info("%s instantiated, ticker: %s, params: %s",
-                    self.__class__.__name__, self.ticker, self.params)
+        logger.info(
+            "%s instantiated, ticker: %s, params: %s",
+            self.__class__.__name__,
+            self.ticker,
+            self.params,
+        )
         self._history = None
         self._dividends = None
         self._splits = None
 
     @staticmethod
-    def data_adjust(data, adjustType='auto'):
+    def data_adjust(data, adjustType="auto"):
         """price adjustments for the historical data.
 
         for yfinance compatibility there are 2 adjustment types:
@@ -548,22 +598,22 @@ class History(yhe.History):
 
         """
         df = data.copy()
-        if adjustType == 'auto':
+        if adjustType == "auto":
             ratio = df["Close"] / df["Adj Close"]
 
-        elif adjustType == 'backadjust':
+        elif adjustType == "backadjust":
             ratio = df["Adj Close"] / df["Close"]
 
         elif adjustType is None:
             # just pass it
-            logger.info('data_adjust: None')
+            logger.info("data_adjust: None")
             return data
 
         else:
-            logger.error('data_adjust: %s invalid', adjustType)
+            logger.error("data_adjust: %s invalid", adjustType)
             raise ValueError(f"Invalid parameter: {adjustType}")
 
-        logger.info('data_adjust: %s', adjustType)
+        logger.info("data_adjust: %s", adjustType)
 
         df["Close"] = df["Adj Close"]
         df["Open"] /= ratio
@@ -573,7 +623,7 @@ class History(yhe.History):
         return df[["Open", "High", "Low", "Close", "Volume"]]
 
     def _parse_quotes(self):
-        data = self.response['chart']['result'][0]
+        data = self.response["chart"]["result"][0]
         timestamps = data["timestamp"]
         ohlc = data["indicators"]["quote"][0]
         closes = ohlc["close"]
@@ -582,39 +632,45 @@ class History(yhe.History):
         if "adjclose" in data["indicators"]:
             adjclose = data["indicators"]["adjclose"][0]["adjclose"]
 
-        quotes = pd.DataFrame({"Open": ohlc["open"],
-                               "High": ohlc["high"],
-                               "Low": ohlc["low"],
-                               "Close": closes,
-                               "Adj Close": adjclose,
-                               "Volume": ohlc['volume']})
+        quotes = pd.DataFrame(
+            {
+                "Open": ohlc["open"],
+                "High": ohlc["high"],
+                "Low": ohlc["low"],
+                "Close": closes,
+                "Adj Close": adjclose,
+                "Volume": ohlc["volume"],
+            }
+        )
 
         quotes.index = pd.to_datetime(timestamps, unit="s")
         quotes.sort_index(inplace=True)
 
-        tz = self.params.get('tz', None)
+        tz = self.params.get("tz", None)
         if tz:
             quotes.index = quotes.index.tz_localize(tz)
 
-        if self.params.get('adjust', None):
-            self._history = self.data_adjust(quotes, adjustType=self.params.get('adjust', None))  # noqa E501
+        if self.params.get("adjust", None):
+            self._history = self.data_adjust(
+                quotes, adjustType=self.params.get("adjust", None)
+            )  # noqa E501
 
         else:
             self._history = quotes
 
     def _parse_splits(self):
         df = pd.DataFrame(columns=["Stock Splits"])
-        data = self.response['chart']['result'][0]
-        _df = parse_actions(data, "splits", self.params.get('tz', None))
+        data = self.response["chart"]["result"][0]
+        _df = parse_actions(data, "splits", self.params.get("tz", None))
         if _df is not None and not _df.empty:
             _df["Stock Splits"] = _df["numerator"] / _df["denominator"]
-            df = pd.concat([df, _df[['Stock Splits']]])
+            df = pd.concat([df, _df[["Stock Splits"]]])
         self._splits = df
 
     def _parse_dividends(self):
         df = pd.DataFrame(columns=["Dividends"])
-        data = self.response['chart']['result'][0]
-        _df = parse_actions(data, "dividends", self.params.get('tz', None))
+        data = self.response["chart"]["result"][0]
+        _df = parse_actions(data, "dividends", self.params.get("tz", None))
         if _df is not None and not _df.empty:
             _df.columns = ["Dividends"]
             df = pd.concat([df, _df])
@@ -626,8 +682,10 @@ class History(yhe.History):
     @property
     def value(self):
         if self._history is not None and not self._history.empty:
-            self._value = pd.concat([self.history, self.dividends, self.splits], axis=1)  # noqa E501
-            for C in ['Dividends', 'Stock Splits']:
+            self._value = pd.concat(
+                [self.history, self.dividends, self.splits], axis=1
+            )  # noqa E501
+            for C in ["Dividends", "Stock Splits"]:
                 self._value[C].fillna(0, inplace=True)
         return self._value
 
@@ -649,11 +707,15 @@ class History(yhe.History):
                 self._parse_dividends()
 
             except Exception as err:  # noqa F841
-                logger.info("No dividend data for ticker: %s "
-                            "for the requested range", self._ticker)
+                logger.info(
+                    "No dividend data for ticker: %s " "for the requested range",
+                    self._ticker,
+                )
 
             else:
-                return self._dividends[(self._dividends.Dividends > 0)]['Dividends']  # noqa E501
+                return self._dividends[(self._dividends.Dividends > 0)][
+                    "Dividends"
+                ]  # noqa E501
 
         return None
 
@@ -664,7 +726,9 @@ class History(yhe.History):
                 self._parse_splits()
 
             except Exception as err:  # noqa F841
-                logger.info("No split data for ticker: %s "
-                            "for the requested range", self._ticker)
+                logger.info(
+                    "No split data for ticker: %s " "for the requested range",
+                    self._ticker,
+                )
 
         return self._splits

@@ -19,11 +19,12 @@ def dyndoc_insert(src):
         if flag == 1:
             # strip the '[' and ']' in case of a list holding items
             # that stand on their own (example: tick records from a stream)
-            nw = re.findall('.*?[(.*)]', v, flags=re.S)
+            nw = re.findall(".*?[(.*)]", v, flags=re.S)
             v = nw[0]
         # add leading whitespace for each line and start with a newline
-        return "\n{}".format("".join(["{0:>16}{1}\n".format("", L)
-                             for L in v.split('\n')]))
+        return "\n{}".format(
+            "".join(["{0:>16}{1}\n".format("", L) for L in v.split("\n")])
+        )
 
     def dec(obj):
         allSlots = re.findall("{(_.*?)}", obj.__doc__)
@@ -38,18 +39,16 @@ def dyndoc_insert(src):
             for k in sub.keys():
                 docsub["{}_url".format(v)] = "{}".format(src[v]["url"])
                 if "resp" == k:
-                    docsub.update({"{}_resp".format(v):
-                                   mkblock(src[v]["response"])})
+                    docsub.update({"{}_resp".format(v): mkblock(src[v]["response"])})
                 if "body" == k:
-                    docsub.update({"{}_body".format(v):
-                                   mkblock(src[v]["body"])})
+                    docsub.update({"{}_body".format(v): mkblock(src[v]["body"])})
 
                 if "params" == k:
-                    docsub.update({"{}_params".format(v):
-                                   mkblock(src[v]["params"])})
+                    docsub.update({"{}_params".format(v): mkblock(src[v]["params"])})
                 if "ciresp" == k:
-                    docsub.update({"{}_ciresp".format(v):
-                                   mkblock(src[v]["response"], 1)})
+                    docsub.update(
+                        {"{}_ciresp".format(v): mkblock(src[v]["response"], 1)}
+                    )
 
         obj.__doc__ = obj.__doc__.format(**docsub)
 
@@ -58,11 +57,14 @@ def dyndoc_insert(src):
     return dec
 
 
-def endpoint(url, domain=None, method="GET", response_type="txt", expected_status=200):  # noqa E501
+def endpoint(
+    url, domain=None, method="GET", response_type="txt", expected_status=200
+):  # noqa E501
     """endpoint - decorator to manipulate the REST-service endpoint.
     The endpoint decorator sets the endpoint and the method for the class
     to access the REST-service.
     """
+
     def dec(obj):
         obj.ENDPOINT = url
         obj.DOMAIN = domain

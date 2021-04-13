@@ -17,7 +17,7 @@ from ...exceptions import ConversionHookError
 logger = logging.getLogger(__name__)
 
 
-@endpoint('quote/{index}/components', domain='https://finance.yahoo.com')
+@endpoint("quote/{index}/components", domain="https://finance.yahoo.com")
 class YhooIndex(VirtualAPIRequest):
     """YhooIndex - request class to handle the index overview endpoint."""
 
@@ -52,7 +52,7 @@ class YhooIndex(VirtualAPIRequest):
         # this url takes index as a route parameter, but also as a query param
         # normally params get passed via the constructor, but since this one
         # is redundant, we create it here
-        self.params = {'p': index}
+        self.params = {"p": index}
         self._index = index
 
     @property
@@ -67,9 +67,10 @@ class YhooIndex(VirtualAPIRequest):
 
         except Exception as err:  # noqa F841
             # let the client deal with the error
-            raise ConversionHookError(422, '')
+            raise ConversionHookError(422, "")
 
         else:
-            logger.info("%s conversion_hook: %s OK",
-                        self.__class__.__name__, self.index)
+            logger.info(
+                "%s conversion_hook: %s OK", self.__class__.__name__, self.index
+            )
             return rv
