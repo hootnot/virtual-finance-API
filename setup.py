@@ -51,6 +51,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/hootnot/virtual_finance_api',
-    version='0.3.2',
+    version='version="0.4.0"',
     zip_safe=False,
 )

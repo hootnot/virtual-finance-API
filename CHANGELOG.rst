@@ -4,6 +4,53 @@ Changelog
 [Unreleased]
 ------------
 
+v0.4.0 (2021-04-13)
+-------------------
+
+New Features
+~~~~~~~~~~~~
+
+-  [endpoints] extensions.stdjson, a standardized JSON layer
+
+Tests
+~~~~~
+
+-  [unittest] unittests regarding
+
+   virtual_finance_api.extensions.stdjson, virtual_finance_api.client
+-  [unittest] yfinance
+
+   Ticker class tests extended
+
+Bug Fixes
+~~~~~~~~~
+
+-  [Makefile] prevent link creation by pandoc
+
+-  [compat.yfinance] Ticker
+
+   property code fixed for properties: dividends, splits, actions
+
+Style Fixes
+~~~~~~~~~~~
+
+-  minor EOL whitespace / empty line changes
+
+Refactoring
+~~~~~~~~~~~
+
+-  [enpoints] History, Options now VirtualAPIRequests
+
+Documentation Changes
+~~~~~~~~~~~~~~~~~~~~~
+
+-  [endpoints] extensions.stdjson added
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [CHANGELOG] templates to generate CHANGELOG
+
 v0.3.2 (2021-03-30)
 -------------------
 
@@ -57,7 +104,7 @@ Administration and Chores
 
 -  [config] requirements, Makefile
 
-   update requirements: include rapidjson Makefile extended
+   update requirements: include rapidjson, Makefile extended
 -  [config] update travis / tox config
 
 v0.2.2 (2021-03-27)
