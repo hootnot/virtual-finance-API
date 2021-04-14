@@ -5,7 +5,8 @@ import logging
 
 try:
     import rapidjson as json
-except ImportError as err:  # noqa F841
+
+except ImportError as err:
     import json
 
 from .exceptions import VirtualFinanceAPIError, ConversionHookError

@@ -41,7 +41,7 @@ class TestScreener_bundle(unittest.TestCase):
     @requests_mock.Mocker()
     def test__predefined_screener001(self, mock_req):
         """get the screener output."""
-        tid = "_predefined_screener"
+        tid = "_screener"
         resp, data = fetchTestData(responses, tid)
         r = yhe.Screener("MOST_SHORTED_STOCKS")
         r.DOMAIN = API_URL
@@ -53,7 +53,7 @@ class TestScreener_bundle(unittest.TestCase):
     @requests_mock.Mocker()
     def test__predefined_screener002(self, mock_req):
         """get the screener output."""
-        tid = "_predefined_screener"
+        tid = "_screener"
         resp, data = fetchTestData(responses, tid)
         r = yhe.Screener("MOST_SHORTED_STOCKS")
         r.DOMAIN = API_URL
@@ -70,7 +70,7 @@ class TestScreener_bundle(unittest.TestCase):
     def test__predefined_screeners001(self, mock_req):
         """get the screeners output 001."""
         # raw data IN, dict (JSON) out
-        tid = "_predefined_screeners"
+        tid = "_screeners"
         resp, data = fetchTestData(responses, tid)
         r = yhe.Screeners()
         r.DOMAIN = API_URL
@@ -84,7 +84,7 @@ class TestScreener_bundle(unittest.TestCase):
     def test__predefined_screeners002(self, mock_req):
         """get the screeners output."""
         # raw data IN, dict (JSON) out
-        tid = "_predefined_screeners"
+        tid = "_screeners"
         resp, data = fetchTestData(responses, tid)
         r = yhe.Screeners()
         r.DOMAIN = API_URL

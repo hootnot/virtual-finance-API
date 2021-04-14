@@ -42,7 +42,7 @@ class TestYahooIndexBundle(unittest.TestCase):
     @requests_mock.Mocker()
     def test__yhoo_index001(self, mock_req):
         """yahoo index ."""
-        tid = "_endpoints_yh_yahooindex"
+        tid = "_yh_yahooindex"
         resp, data = fetchTestData(responses, tid)
         resp = fetchFullResponse(tid)
         r = yh.YhooIndex("%5EIXIC")
@@ -55,7 +55,7 @@ class TestYahooIndexBundle(unittest.TestCase):
     @requests_mock.Mocker()
     def test__yhoo_index002(self, mock_req):
         """yahoo index ."""
-        tid = "_endpoints_yh_yahooindex"
+        tid = "_yh_yahooindex"
         resp, data = fetchTestData(responses, tid)
         r = yh.YhooIndex("%5EIXIC")
         r.DOMAIN = API_URL

@@ -7,6 +7,7 @@ import requests_mock
 import json
 import logging
 import pandas as pd
+import numpy as np
 
 
 try:
@@ -79,11 +80,14 @@ class TestCompatYfinance(unittest.TestCase):
         """Ticker instance history."""
         COLUMNS = ["Open", "High", "Low", "Close", "Volume"]
         tid = "_yf_history_IBM"
-        resp, data, params = fetchTestData(
-            yf.endpoints.responses.bundle.responses, tid
-        )  # noqa E501
+        resp, data, params = fetchTestData(yf.endpoints.responses.bundle.responses, tid)
         # params = {'period': 'max', 'auto_adjust': True, 'back_adjust': False}
-        params = {"period": "max", "auto_adjust": False, "back_adjust": True}
+        params = {
+            "period": "max",
+            "auto_adjust": False,
+            "back_adjust": True,
+            "actions": True,
+        }
         tid = "_je_history_backadjust"
         resp = fetchFullResponse(tid)
         # now hack the class, not the instance!
@@ -98,15 +102,26 @@ class TestCompatYfinance(unittest.TestCase):
         respDF.drop(columns=["adjclose"], inplace=True)
         respDF.index = pd.to_datetime(respDF.index, unit="s")
         # rename open->Open etc, fabricate the columns dict
-        respDF = respDF.rename(
-            columns=dict(zip([c.lower() for c in COLUMNS], COLUMNS))
-        )  # noqa E501
+        respDF = respDF.rename(columns=dict(zip([c.lower() for c in COLUMNS], COLUMNS)))
         respDF = respDF[COLUMNS]
 
         TH = ticker.history(**params)
         TH = TH[COLUMNS]
 
         self.assertTrue(TH.equals(respDF))
+
+        tid = "_je_history_backadjust"
+        resp = fetchFullResponse(tid)
+        self.assertTrue(
+            sorted(list(ticker.splits.values))
+            == sorted([s["numerator"] / s["denominator"] for s in resp["splits"]])
+            and sorted(list(ticker.dividends.values))
+            == sorted([d["amount"] for d in resp["dividends"]])
+            and ticker.actions.to_json()
+            == pd.DataFrame(pd.concat([ticker.dividends, ticker.splits], axis=1))
+            .replace(np.NaN, 0.0)
+            .to_json()
+        )
 
     @parameterized.expand(
         [
@@ -272,7 +287,8 @@ class TestCompatYfinance(unittest.TestCase):
                 ("quarterly",),
                 "yahoo_financials.raw",
             ),
-        ]
+        ],
+        skip_on_empty=True,
     )
     @requests_mock.Mocker(kw="mock")
     def test__Ticker_attrs(
@@ -306,7 +322,7 @@ class TestCompatYfinance(unittest.TestCase):
             getattr(ticker, attrname)
             if isinstance(attrname, str)
             else getattr(ticker, attrname[0])(attrname[1])
-        )  # noqa E501
+        )
         if isinstance(instancedata, tuple):
             instancedata = list(instancedata)
         if toJSON is not None:
@@ -315,4 +331,6 @@ class TestCompatYfinance(unittest.TestCase):
                 _tframe = toJSON[0]
                 resp = resp[_tframe]
 
+        #        print("+++++++++++++++++++++++++++++++++++++++++\n", instancedata)
+        #        print("=========================================\n", resp)
         self.assertTrue(instancedata == resp)

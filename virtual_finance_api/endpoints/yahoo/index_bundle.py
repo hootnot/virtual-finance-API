@@ -6,7 +6,7 @@ import pandas as pd
 
 try:
     import rapidjson as json
-except ImportError as err:  # noqa F841
+except ImportError as err:
     import json
 
 import logging
@@ -43,7 +43,7 @@ class YhooIndex(VirtualAPIRequest):
 
         ::
 
-            {_endpoints_yh_yahooindex_resp}
+            {_yh_yahooindex_resp}
 
         """
         endpoint = self.ENDPOINT.format(index=index)
@@ -65,7 +65,7 @@ class YhooIndex(VirtualAPIRequest):
             data = pd.read_html(s)
             rv = json.loads(data[0].to_json())
 
-        except Exception as err:  # noqa F841
+        except Exception as err:
             # let the client deal with the error
             raise ConversionHookError(422, "")
 

@@ -19,7 +19,7 @@ from virtual_finance_api.exceptions import (  # noqa F401
     ConversionHookError,
     VirtualFinanceAPIError,
 )
-import virtual_finance_api.compat.yfinance.endpoints.bundle as hp
+import virtual_finance_api.endpoints.yahoo.util as hp
 
 client = None
 API_URL = "https://test.com"

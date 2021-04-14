@@ -1,8 +1,8 @@
 """Top-level package for Virtual Finance API."""
 
 import logging
-from .client import Client  # noqa F401
-from .exceptions import VirtualFinanceAPIError  # noqa F401
+from .client import Client
+from .exceptions import VirtualFinanceAPIError
 
 
 __author__ = """Feite Brekeveld"""

@@ -3,7 +3,7 @@
 responses serve both testing purpose aswell as dynamic docstring replacement
 """
 responses = {
-    "_predefined_screener": {
+    "_screener": {
         "url": "/screener/predefined/{name}",
         "response": {
             "rows": [
@@ -762,7 +762,7 @@ responses = {
             "filters": {},
         },
     },
-    "_predefined_screeners": {
+    "_screeners": {
         "url": "/screener",
         "response": {
             "screeners": [

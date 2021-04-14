@@ -19,6 +19,10 @@ from virtual_finance_api.exceptions import (  # noqa F401
     VirtualFinanceAPIError,
 )
 from virtual_finance_api.compat.yfinance.endpoints.bundle import responses
+
+# from virtual_finance_api.extensions.stdjson.endpoints.bundle import (
+#    responses as je_responses,
+# )
 import virtual_finance_api.compat.yfinance.endpoints as yfe
 
 # import virtual_finance_api.compat.yfinance as yf
@@ -48,7 +52,7 @@ class TestCompatYfinance(unittest.TestCase):
                 "calendar",
                 "_yf_profile_calendar",
                 "yahoo_profile.raw",
-                ["calendarEvents", "upgradeDowngradeHistory", "esgScores"],
+                ["calendar", "upgradeDowngradeHistory", "esgScores"],
             ),
             (
                 yfe.Profile,
@@ -80,10 +84,13 @@ class TestCompatYfinance(unittest.TestCase):
                 "yahoo_holders.raw",
                 [],
             ),
-        ]
+        ],
+        skip_on_empty=True,
     )
     @requests_mock.Mocker(kw="mock")
     def test__yf_None(self, cls, attr, tid, rawfile, comp, **kwargs):
+        import pandas as pd
+
         resp, data = fetchTestData(responses, tid)
         try:
             _resp = fetchFullResponse(tid)
@@ -149,7 +156,8 @@ class TestCompatYfinance(unittest.TestCase):
             (yfe.Financials, "balancesheet", "_yf_financials_balancesheet"),
             (yfe.Financials, "cashflow", "_yf_financials_cashflow"),
             (yfe.Financials, "financials", "_yf_financials_financials"),
-        ]
+        ],
+        skip_on_empty=True,
     )
     @requests_mock.Mocker(kw="mock")
     def test__yf_financials(self, cls, attr, tid, **kwargs):
@@ -201,8 +209,8 @@ class TestCompatYfinance(unittest.TestCase):
         client.request(r)
         self.assertTrue(
             {
-                "calls": json.loads(r.option_chain("2021-03-26")[0].to_json()),
-                "puts": json.loads(r.option_chain("2021-03-26")[1].to_json()),
+                "calls": json.loads(r.option_chain()[0].to_json()),
+                "puts": json.loads(r.option_chain()[1].to_json()),
             }
             == resp
         )
@@ -217,7 +225,10 @@ class TestCompatYfinance(unittest.TestCase):
         """History-history ."""
         tid = "_yf_history_IBM"
         resp, data, params = fetchTestData(responses, tid)
+
+        tid = "_je_history_backadjust"
         resp = fetchFullResponse(tid)
+        rawdata = fetchRawData("yahoo_history.raw")
         params = {
             "period": "max",
             "interval": "1d",
@@ -226,57 +237,14 @@ class TestCompatYfinance(unittest.TestCase):
         }
         r = yfe.History("IBM", params=params)
         r.DOMAIN = API_URL
-        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=json.dumps(resp))
+        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=rawdata)
         client.request(r)
         self.assertTrue(
-            (r.response == resp)
-            and (
-                list(r.history["Open"].values)
-                == resp["chart"]["result"][0]["indicators"]["quote"][0]["open"]
-            )
-            and (  # noqa E501
-                list(r.history["High"].values)
-                == resp["chart"]["result"][0]["indicators"]["quote"][0]["high"]
-            )
-            and (  # noqa E501
-                list(r.history["Low"].values)
-                == resp["chart"]["result"][0]["indicators"]["quote"][0]["low"]
-            )
-            and (  # noqa E501
-                list(r.history["Close"].values)
-                == resp["chart"]["result"][0]["indicators"]["quote"][0]["close"]
-            )
-            and (  # noqa E501
-                list(r.history["Volume"].values)
-                == resp["chart"]["result"][0]["indicators"]["quote"][0]["volume"]
-            )
-            and (  # noqa E501
-                sorted(list(r.dividends.values))
-                == sorted(
-                    [
-                        d["amount"]
-                        for k, d in resp["chart"]["result"][0]["events"][
-                            "dividends"
-                        ].items()
-                    ]
-                )
-            )
-            and (  # noqa E501
-                sorted(list(r.splits.values))
-                == sorted(
-                    [
-                        s["numerator"] / s["denominator"]
-                        for k, s in resp["chart"]["result"][0]["events"][
-                            "splits"
-                        ].items()
-                    ]
-                )
-            )
-        )  # noqa E501
-
-        r = yfe.History("IBM", params=params)
-        r._dvididends = None
-        self.assertTrue(r.dividends is None)
-        r._splits = None
-        print(r.splits)
-        self.assertTrue(r.splits is None)
+            (r.response["ohlcdata"]["adjclose"] == resp["ohlcdata"]["adjclose"])
+            and (r.response["ohlcdata"]["timestamp"] == resp["ohlcdata"]["timestamp"])
+            and (r.response["ohlcdata"]["volume"] == resp["ohlcdata"]["volume"])
+            and sorted(list(r.dividends.values))
+            == sorted([d["amount"] for d in resp["dividends"]])
+            and sorted(list(r.splits.values))
+            == sorted([s["numerator"] / s["denominator"] for s in resp["splits"]])
+        )

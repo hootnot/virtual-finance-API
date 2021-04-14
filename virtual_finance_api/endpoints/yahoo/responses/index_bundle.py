@@ -3,7 +3,7 @@
 responses serve both testing purpose aswell as dynamic docstring replacement
 """
 responses = {
-    "_endpoints_yh_yahooindex": {
+    "_yh_yahooindex": {
         "url": "/quote/{index}/components",
         "response": {
             "Symbol": {

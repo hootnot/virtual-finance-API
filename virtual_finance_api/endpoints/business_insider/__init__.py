@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .isin import ISIN  # noqa F401
+from .isin import ISIN
 
 __all__ = ("ISIN",)

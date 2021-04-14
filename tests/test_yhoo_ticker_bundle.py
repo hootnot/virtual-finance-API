@@ -18,6 +18,10 @@ from virtual_finance_api.exceptions import (  # noqa F401
     VirtualFinanceAPIError,
 )
 from virtual_finance_api.endpoints.yahoo.ticker_bundle import responses
+
+# from virtual_finance_api.extensions.stdjson.endpoints.bundle import (
+#    responses as je_responses,
+# )
 import virtual_finance_api.endpoints.yahoo as yh
 from virtual_finance_api.endpoints.decorators import endpoint
 
@@ -55,7 +59,7 @@ class TestYahooTickerBundle(unittest.TestCase):
 
     @parameterized.expand(
         [
-            (yh.Holders, "IBM", "_yh_holders", False, "yahoo_holders.raw"),
+            (yh.Holders, "IBM", "_yh_holders", True, "yahoo_holders.raw"),
             (yh.Profile, "IBM", "_yh_profile", True, "yahoo_profile.raw"),
             (yh.Financials, "IBM", "_yh_financials", True, "yahoo_financials.raw"),
             (yh.Options, "IBM", "_yh_options", True, "yahoo_options.raw"),
@@ -67,6 +71,8 @@ class TestYahooTickerBundle(unittest.TestCase):
     ):  # noqa E501
         resp, data = fetchTestData(responses, tid)
         if useFullResponse:
+            # refactor:
+            tid = tid.replace("_yh", "_je")
             resp = fetchFullResponse(tid)
         r = cls(ticker)
         r.DOMAIN = API_URL
@@ -77,10 +83,11 @@ class TestYahooTickerBundle(unittest.TestCase):
 
     @parameterized.expand(
         [
-            (yh.Holders, "IBM", "_yh_holders", False, "yahoo_holders.raw"),
+            (yh.Holders, "IBM", "_yh_holders", True, "yahoo_holders.raw"),
             (yh.Profile, "IBM", "_yh_profile", True, "yahoo_profile.raw"),
             (yh.Financials, "IBM", "_yh_financials", True, "yahoo_financials.raw"),
-        ]
+        ],
+        skip_on_empty=True,
     )
     @requests_mock.Mocker(kw="mock")
     def test__excep(

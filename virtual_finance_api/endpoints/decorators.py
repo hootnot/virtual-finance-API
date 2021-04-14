@@ -8,7 +8,8 @@ def dyndoc_insert(src):
     # the JSON needs leading whitespace to be interpreted correctly
     try:
         import rapidjson as json
-    except ImportError as err:  # noqa F841
+
+    except ImportError as err:
         import json
 
     import re
@@ -57,9 +58,7 @@ def dyndoc_insert(src):
     return dec
 
 
-def endpoint(
-    url, domain=None, method="GET", response_type="txt", expected_status=200
-):  # noqa E501
+def endpoint(url, domain=None, method="GET", response_type="txt", expected_status=200):
     """endpoint - decorator to manipulate the REST-service endpoint.
     The endpoint decorator sets the endpoint and the method for the class
     to access the REST-service.

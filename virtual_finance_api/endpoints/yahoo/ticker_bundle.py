@@ -2,13 +2,15 @@
 """All Yahoo requests that require ticker as route parameter in the request."""
 
 from ..decorators import endpoint, dyndoc_insert
-from .util import response2json
+from .util import response2json, extract_domain, hprocopt
+
 import logging
 import pandas as pd
 
 try:
     import rapidjson as json
-except ImportError as err:  # noqa F841
+
+except ImportError as err:
     import json
 
 from ..apirequest import APIRequest, VirtualAPIRequest
@@ -73,20 +75,51 @@ class Financials(VirtualAPIRequest, Yhoo):
         super(Financials, self).__init__(ticker)
 
     def _conversion_hook(self, s):
-        rv = None
-        try:
-            rv = response2json(s)
+        """transform the response into a 'standardized' JSON response
 
-        except Exception as err:  # noqa F841
-            # let the client deal with the error
+        for all groups we want to have yearly and quarterly, like:
+
+        {'cashflow': {
+            'yearly': { ...},
+            'quarterly': { ...},
+          },
+          ...
+        }
+        """
+        data = None
+        _resp = {}
+
+        try:
+            data = response2json(s)
+
+            for repgroup in (
+                ("cashflow", "cashflowStatement", "cashflowStatements"),
+                ("balancesheet", "balanceSheet", "balanceSheetStatements"),
+                ("financials", "incomeStatement", "incomeStatementHistory"),
+            ):
+                attr, subject, details = repgroup
+                for itemDetail, key in [("", "yearly"), ("Quarterly", "quarterly")]:
+                    item = f"{subject}History{itemDetail}"
+                    if isinstance(data.get(item), dict):
+                        if attr not in _resp:
+                            _resp.update({attr: {}})
+                        _resp[attr].update({key: data[item][details]})
+
+            # earnings
+            if data.get("earnings", None):
+                _resp.update({"earnings": {}})
+                earnings = data["earnings"]["financialsChart"]
+                _resp.update({"earnings": data["earnings"]["financialsChart"]})
+
+        except Exception as err:
+            logger.error(err)
             raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
-            return rv
+            return _resp
 
 
-# @endpoint('v7/finance/download/{ticker}')   # 7 or 8 ?
 @endpoint(
     "v8/finance/chart/{ticker}",
     response_type="json",
@@ -95,7 +128,7 @@ class Financials(VirtualAPIRequest, Yhoo):
 class History(VirtualAPIRequest, Yhoo):
     """History - class to handle the history endpoint."""
 
-    # @dyndoc_insert(responses)
+    @dyndoc_insert(responses)
     def __init__(self, ticker, params):
         """Instantiate a History APIRequest instance.
 
@@ -105,25 +138,154 @@ class History(VirtualAPIRequest, Yhoo):
             the ticker to perform the request for.
 
         params : dict (optional)
-            dictionary with optional parameters to perform the request
+            dictionary with optional parameters to perform the request,
             parameters default to 1 month of daily (1d) historical data.
+
+
+        ::
+            {_yh_history_params}
+
+
+        >>> import virtual_finance_api as fa
+        >>> import virtual_finance_api.endpoints.yahoo as yh
+        >>> client = fa.Client()
+        >>> r = yh.History('IBM', params=params)
+        >>> rv = client.request(r)
+
+        >>> print(r.response)
+
+        ::
+
+            {_yh_history_resp}
+
+
         """
         super(History, self).__init__(ticker)
-        self.params = params
+        self.params = hprocopt(**params)
+
+        logger.info(
+            "%s instantiated, ticker: %s, params: %s",
+            self.__class__.__name__,
+            self.ticker,
+            self.params,
+        )
 
     def _conversion_hook(self, s):
-        rv = None
+        """call the conversionhook of the parent class to get our data
+        then standardize the JSON data here to get:
+
+            {
+               'ohlcdata': {...},
+               'dividends': {...},
+               'spits': {...},
+            }
+
+        """
+
+        def _ordered_timeitems(d, cat):
+            """
+            dividends / splits
+            yahoo has dicts with items like:
+                "878826600": {
+                   "amount": 0.1,
+                   "date": 878826600
+                },
+            string type epoch as key, numeric value in the value dict
+            this function transforms these dicts in a list of (epoch)
+            ordered value dicts:
+                [ {...},
+                  {
+                   "amount": 0.1,
+                   "date": 878826600
+                },
+                ...
+               ]
+            """
+            try:
+                res = [d[cat][str(k)] for k in sorted(int(dt) for dt in d[cat].keys())]
+
+            except Exception as err:
+                logger.info("no data for: cat %s", cat)
+                return []
+
+            else:
+                return res
+
+        def adjust(ohlcdata, adjustType=None):
+            """price adjustments for the historical data.
+
+            for yfinance compatibility there are 2 adjustment types:
+            - auto adjust
+            - back adjust
+
+            ohlcdata is: { 'timestamp': [...],
+                           'open': [...],
+                           'high': [...],
+                           'low': [...],
+                           'close': [...],
+                           'volume': [...]}
+            """
+            if adjustType == "auto":
+                num, denom = "close", "adjclose"
+
+            elif adjustType == "backadjust":
+                num, denom = "adjclose", "close"
+
+            else:
+                logger.warning("adjust: None")
+                return ohlcdata
+
+            ratio = [
+                ohlcdata[num][i] / ohlcdata[denom][i]
+                for i in range(len(ohlcdata["close"]))
+            ]
+
+            ohlcdata["close"] = ohlcdata["adjclose"]
+            for qc in ["open", "high", "low"]:
+                ohlcdata[qc] = [
+                    ohlcdata[qc][i] / ratio[i] for i in range(len(ohlcdata["close"]))
+                ]
+
+            return ohlcdata
+
+        # transform the yahoo data
+        tdata = {}
+
         try:
-            rv = json.loads(s)
+            resp = json.loads(s)
+            _data = resp["chart"]["result"][0]
+            tdata.update({"meta": _data["meta"]})
+            tdata.update({"ohlcdata": {}})
+            tdata["ohlcdata"].update({"timestamp": _data["timestamp"]})
+            tdata["ohlcdata"].update(_data["indicators"]["quote"][0])
+            tdata["ohlcdata"].update(_data["indicators"]["adjclose"][0])
+            if "events" in _data:
+                for cat in ["dividends", "splits"]:
+                    try:
+                        tdata.update({cat: _ordered_timeitems(_data["events"], cat)})
+
+                    except Exception as err:
+                        logger.warning(
+                            "no events for %s cat: %s [%s]", self.ticker, cat, err
+                        )
+
+                    else:
+                        logger.info(
+                            "added: %s cat: %s, #%s", self.ticker, cat, len(tdata[cat])
+                        )
+
+            # adjust data ?
+            _pAdjust = self.params.get("adjust", None)
+            if _pAdjust:
+                logger.info("adjust: %s %s", self.ticker, _pAdjust)
+                tdata["ohlcdata"] = adjust(tdata["ohlcdata"], adjustType=_pAdjust)
 
         except Exception as err:
-            # let the client deal with the error
             logger.error(err)
             raise ConversionHookError(422, "")
 
         else:
-            logger.info("conversion_hook: %s OK", self.ticker)
-            return rv
+            return tdata
 
 
 @endpoint("quote/{ticker}/holders", domain="https://finance.yahoo.com")
@@ -158,27 +320,80 @@ class Holders(VirtualAPIRequest, Yhoo):
         super(Holders, self).__init__(ticker)
 
     def _conversion_hook(self, s):
-        # build the JSON response from the HTML
-        response = {}
+        """call the conversionhook of the parent class to get our data
+        then standardize the JSON data here to get:
 
+            {
+               "major": [ .. ],
+               "institutional": {
+                  "legend": { .. },
+                  "holders": [ .. ],
+               },
+               "mutualfund": {
+                  "legend": { .. },
+                  "holders": [ .. ],
+               },
+            }
+        """
+
+        def normalize(data, K):
+            _record = {}
+            _legend = {}
+            for k, v in data[K].items():
+                _k = k.lower().replace(" ", "_").replace("%", "pch")
+                if _k not in _legend:
+                    _legend.update({_k: k})
+                for i, (kk, vv) in enumerate(v.items()):
+                    if i not in _record:
+                        _record.update({i: {}})
+                    if isinstance(vv, (str,)) and "%" in vv:
+                        vv = float(vv.replace("%", ""))
+                    _record[i].update({_k: vv})
+
+            return {"legend": _legend, "holders": list(_record.values())}
+
+        _resp = {}
+
+        data = {}
         try:
-            data = pd.read_html(s)
+            _data = pd.read_html(s)
             for i, k in enumerate(["major", "institutional", "mutualfund"]):
                 logger.debug("conversion_hook: %s", k)
                 try:
-                    response.update({k: json.loads(data[i].to_json())})
+                    data.update({k: json.loads(_data[i].to_json())})
 
-                except IndexError as iErr:  # noqa F841
+                except IndexError as iErr:
                     # not always all are available
                     logger.debug("conversion_hook: %s failed, no data", k)
 
-        except Exception as err:  # noqa F841
-            # let the client deal with a 'fatal' error
+            _resp.update(
+                {
+                    "major": [
+                        list(l)
+                        for l in zip(
+                            data["major"]["0"].values(), data["major"]["1"].values()
+                        )
+                    ]
+                }
+            )
+            for k in ["institutional", "mutualfund"]:
+                try:
+                    ndd = normalize(data, k)
+
+                except KeyError as err:
+                    # allow that error
+                    logger.warning(err)
+
+                else:
+                    if ndd:
+                        _resp.update({k: ndd})
+
+        except Exception as err:
+            logger.error(err)
             raise ConversionHookError(422, "")
 
         else:
-            logger.info("conversion_hook: %s OK", self.ticker)
-            return response
+            return _resp
 
 
 @endpoint(
@@ -217,22 +432,29 @@ class Options(VirtualAPIRequest, Yhoo):
 
         """
         super(Options, self).__init__(ticker)
-        self.params = {"p": ticker}
-
-        if params is not None:
-            self.params.update(**params)
+        self.params = params
 
     def _conversion_hook(self, s):
-        try:
-            rv = json.loads(s)
 
-        except Exception as err:  # noqa F841
-            # let the client deal with the error
+        resp = {}
+        try:
+            data = json.loads(s)
+            for attr in [
+                "underlyingSymbol",
+                "expirationDates",
+                "strikes",
+                "hasMiniOptions",
+                "options",
+            ]:
+                resp.update({attr: data["optionChain"]["result"][0][attr]})
+
+        except Exception as err:
+            logger.error(err)
             raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
-            return rv
+            return resp
 
 
 @endpoint("quote/{ticker}", domain="https://finance.yahoo.com")
@@ -266,14 +488,62 @@ class Profile(VirtualAPIRequest, Yhoo):
         super(Profile, self).__init__(ticker)
 
     def _conversion_hook(self, s):
-        rv = None
-        try:
-            rv = response2json(s)
+        """call the conversionhook of the parent class to get our data
+        then standardize the JSON data here to get:
 
-        except Exception as err:  # noqa F841
-            # let the client deal with the error
+            {
+               'profile': {
+                   'recommendations': {},
+                   'calendar': {},
+                   'info': {},
+               }
+            }
+
+        """
+        resp = {}
+
+        def info(response):
+            rv = {}
+            SECTIONS = [
+                "summaryProfile",
+                "summaryDetail",
+                "quoteType",
+                "defaultKeyStatistics",
+                "assetProfile",
+                "summaryDetail",
+            ]
+            for section in SECTIONS:
+                if section in response:
+                    rv.update(response[section])
+
+            rv["regularMarketPrice"] = rv["regularMarketOpen"]
+            rv["logo_url"] = ""
+            domain = extract_domain(rv["website"])
+            if domain:
+                rv["logo_url"] = f"https://logo.clearbit.com/{domain}"
+
+            return rv
+
+        def recommendations(response):
+            return response["upgradeDowngradeHistory"]["history"]
+
+        def calendar(response):
+            return response["calendarEvents"]
+
+        def sustainability(response):
+            return response["esgScores"]
+
+        try:
+            data = response2json(s)
+            resp.update({"info": info(data)})
+            resp.update({"recommendations": recommendations(data)})
+            resp.update({"calendar": calendar(data)})
+            resp.update({"sustainability": sustainability(data)})
+
+        except Exception as err:
+            logger.error(err)
             raise ConversionHookError(422, "")
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
-            return rv
+            return resp

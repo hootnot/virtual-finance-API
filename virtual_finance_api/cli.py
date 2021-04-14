@@ -60,7 +60,7 @@ def history():  # pragma: no cover
 @click.argument("ticker")
 def get_profile(
     info, calendar, sustainability, recommendations, ticker
-):  # noqa E501  # pragma: no cover
+):  # pragma: no cover
     """Profile."""
     repcats = [info, calendar, sustainability, recommendations]
     if repcats.count(None) == len(repcats):
@@ -73,7 +73,7 @@ def get_profile(
 @financials.command("financials")
 @click.option(
     "--reportperiod", type=click.Choice(["y", "q"], case_sensitive=False), default="y"
-)  # noqa E501  # pragma: no cover
+)  # pragma: no cover
 @click.option("--balancesheet", flag_value="balancesheet")
 @click.option("--earnings", flag_value="earnings")
 @click.option("--cashflow", flag_value="cashflow")
@@ -81,7 +81,7 @@ def get_profile(
 @click.argument("ticker")
 def get_financials(
     reportperiod, balancesheet, earnings, cashflow, financials, ticker
-):  # noqa E501  # pragma: no cover
+):  # pragma: no cover
     # """Financials."""
     repcats = [balancesheet, earnings, cashflow, financials]
     if repcats.count(None) == len(repcats):
@@ -110,10 +110,10 @@ def get_holders(major, mutualfund, institutional, ticker):  # pragma: no cover
 @holders.command("history")
 @click.option(
     "--period", type=click.Choice(PERIODS, case_sensitive=False), default="1mo"
-)  # noqa E501
+)
 @click.option(
     "--interval", type=click.Choice(INTERVALS, case_sensitive=False), default="1d"
-)  # noqa E501
+)
 @click.option("--csv", flag_value="csv")
 @click.argument("ticker")
 def get_history(period, interval, csv, ticker):  # pragma: no cover

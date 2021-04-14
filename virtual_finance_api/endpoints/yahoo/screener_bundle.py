@@ -33,7 +33,7 @@ class Screener(VirtualAPIRequest):
 
         ::
 
-            {_predefined_screener_resp}
+            {_screener_resp}
 
         """
         endpoint = self.ENDPOINT.format(name=name)
@@ -44,7 +44,7 @@ class Screener(VirtualAPIRequest):
         try:
             rv = get_store(s, "ScreenerResultsStore")["results"]
 
-        except Exception as err:  # noqa F841
+        except Exception as err:
             # let the client deal with the error
             logger.error("ConversionHookError: %s", err)
             raise ConversionHookError(422, "Unprocessable Entity")
@@ -74,7 +74,7 @@ class Screeners(VirtualAPIRequest):
 
         ::
 
-            {_predefined_screeners_resp}
+            {_screeners_resp}
 
         """
         endpoint = self.ENDPOINT
@@ -90,7 +90,7 @@ class Screeners(VirtualAPIRequest):
                     d.update({attr: M[attr]})
                 rv.append(d)
 
-        except Exception as err:  # noqa F841
+        except Exception as err:
             # let the client deal with the error
             raise ConversionHookError(422, "Unprocessable Entity")
 

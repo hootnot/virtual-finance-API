@@ -58,9 +58,7 @@ class ISIN(VirtualAPIRequest):
 
         if lookup not in response:
             lookup = '"|'
-            if (
-                ticker.lower() not in response.lower() or lookup not in response
-            ):  # noqa E501
+            if ticker.lower() not in response.lower() or lookup not in response:
                 # raise a NOT FOUND status
                 raise ConversionHookError(404, "ISIN not found")
 
@@ -69,7 +67,7 @@ class ISIN(VirtualAPIRequest):
             try:
                 _isin = ISINCode(v)
 
-            except ValueError as err:  # noqa F841
+            except ValueError as err:
                 raise ConversionHookError(422, "Unprocessable Entity")
 
             else:
