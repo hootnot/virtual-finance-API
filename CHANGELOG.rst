@@ -4,6 +4,26 @@ Changelog
 [Unreleased]
 ------------
 
+v0.4.1 (2021-04-15)
+-------------------
+
+Style Fixes
+~~~~~~~~~~~
+
+-  [black] black applied to library + tests + setup.py
+
+Refactoring
+~~~~~~~~~~~
+
+-  [endpoints] make the basic requests return the standardized JSON of
+   the extensions.stdjson requests. Remove the extensions.stdjson.
+   Modify compat.yfinance to use the standardized JSON.
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [pre-commit] added / configured pre-commit
+
 v0.4.0 (2021-04-13)
 -------------------
 
@@ -15,21 +35,18 @@ New Features
 Tests
 ~~~~~
 
--  [unittest] unittests regarding
+-  [unittest] unittests regarding virtual_finance_api.extensions.stdjson
+   virtual_finance_api.client
 
-   virtual_finance_api.extensions.stdjson, virtual_finance_api.client
--  [unittest] yfinance
-
-   Ticker class tests extended
+-  [unittest] yfinance Ticker class tests extended
 
 Bug Fixes
 ~~~~~~~~~
 
 -  [Makefile] prevent link creation by pandoc
 
--  [compat.yfinance] Ticker
-
-   property code fixed for properties: dividends, splits, actions
+-  [compat.yfinance] Ticker property code fixed for properties:
+   dividends splits actions
 
 Style Fixes
 ~~~~~~~~~~~
@@ -102,9 +119,9 @@ Refactoring
 Administration and Chores
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  [config] requirements, Makefile
+-  [config] requirements, Makefile update requirements: include
+   rapidjson Makefile extended
 
-   update requirements: include rapidjson, Makefile extended
 -  [config] update travis / tox config
 
 v0.2.2 (2021-03-27)
@@ -133,15 +150,11 @@ New Features
 
 -  [yahoo endpoints] Yahoo endpoint request classes
 
--  [endpoints] business_insider
+-  [endpoints] business_insider ISIN request class
 
-   ISIN request class
--  [generic] ISINCode
+-  [generic] ISINCode class to handle ISIN-codes
 
-   class to handle ISIN-codes
--  [base] base classes
-
-   classes to handle and setup API requests
+-  [base] base classes classes to handle and setup API requests
 
 Tests
 ~~~~~
