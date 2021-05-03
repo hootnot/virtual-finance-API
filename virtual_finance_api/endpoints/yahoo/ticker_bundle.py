@@ -535,10 +535,6 @@ class Profile(VirtualAPIRequest, Yhoo):
 
         try:
             data = response2json(s)
-            resp.update({"info": info(data)})
-            resp.update({"recommendations": recommendations(data)})
-            resp.update({"calendar": calendar(data)})
-            resp.update({"sustainability": sustainability(data)})
 
         except Exception as err:
             logger.error(err)
@@ -546,4 +542,15 @@ class Profile(VirtualAPIRequest, Yhoo):
 
         else:
             logger.info("conversion_hook: %s OK", self.ticker)
-            return resp
+
+        try:
+            resp.update({"info": info(data)})
+            resp.update({"recommendations": recommendations(data)})
+            resp.update({"calendar": calendar(data)})
+            resp.update({"sustainability": sustainability(data)})
+
+        except Exception as err:
+            logger.error(err)
+            raise ConversionHookError(404, "Profile not found")
+
+        return resp
