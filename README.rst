@@ -60,7 +60,7 @@ With *virtual_finance_api* installed, it is directly available via the commandli
 .. code-block:: bash
 
    $ virtual_finance_api --help
-   Usage: virtual_finance_api [OPTIONS] COMMAND [ARGS]...
+   Usage: vfapi [OPTIONS] COMMAND [ARGS]...
 
      Virtual Finance API commandline app.
 
@@ -78,8 +78,8 @@ With *virtual_finance_api* installed, it is directly available via the commandli
 
 .. code-block:: bash
 
-   virtual_finance_api history --help
-   Usage: virtual_finance_api history [OPTIONS] TICKER
+   vfapi history --help
+   Usage: vfapi history [OPTIONS] TICKER
 
    Options:
      --period [1d|5d|1mo|3mo|6mo|1y|2y|5y|10y|ytd|max]
@@ -91,7 +91,7 @@ So, lets query for some history for IBM ...
 
 .. code-block:: bash
 
-   $ virtual_finance_api history IBM
+   $ vfapi history IBM
                               Open        High         Low       Close   Volume
    2021-03-01 14:30:00  120.349998  122.320000  119.860001  120.739998  5714500
    2021-03-02 14:30:00  120.739998  121.900002  120.260002  120.330002  4522200

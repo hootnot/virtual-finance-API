@@ -33,9 +33,7 @@ setup(
     ],
     description="Virtual Finance API provides access to data from financial "
     "sites as if it was a REST-API.",
-    entry_points={
-        "console_scripts": ["virtual_finance_api=virtual_finance_api.cli:main"]
-    },
+    entry_points={"console_scripts": ["vfapi=virtual_finance_api.cli:main"]},
     install_requires=requirements,
     license="Apache Software License 2.0",
     long_description=readme + "\n\n" + history,
