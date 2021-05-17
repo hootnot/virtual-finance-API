@@ -4,6 +4,16 @@ Changelog
 [Unreleased]
 ------------
 
+Bug Fixes
+~~~~~~~~~
+
+-  [yahoo.Profile] add a 404
+
+Refactoring
+~~~~~~~~~~~
+
+-  apply typing
+
 v0.4.1 (2021-04-15)
 -------------------
 

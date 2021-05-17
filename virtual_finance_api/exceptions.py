@@ -8,7 +8,7 @@ class VirtualFinanceAPIError(Exception):
     to raise an exception representing that error.
     """
 
-    def __init__(self, code, msg):
+    def __init__(self, code: int, msg: str):
         """Instantiate a VirtualFinanceError.
 
         Parameters
@@ -23,6 +23,6 @@ class VirtualFinanceAPIError(Exception):
 
 
 class ConversionHookError(Exception):
-    def __init__(self, code, msg):
+    def __init__(self, code: int, msg: str):
         super(ConversionHookError, self).__init__(msg)
         self.code = code

@@ -18,7 +18,7 @@ DEFAULT_HEADERS = {"Accept-Encoding": "gzip, deflate"}
 
 
 class Client:
-    def __init__(self, headers=None, request_params=None):
+    def __init__(self, headers: dict = None, request_params: dict = None):
         """Instantiate a Client instance.
 
         Parameters
@@ -69,7 +69,7 @@ class Client:
         """request_params property."""
         return self._request_params
 
-    def request(self, endpoint):
+    def request(self, endpoint: VirtualAPIRequest):
         """Perform a request for the APIRequest instance 'endpoint'.
 
         Parameters
@@ -180,11 +180,6 @@ class Client:
                 raise ValueError(
                     f"request: {endpoint}, " "response could not be loaded as JSON"
                 )
-
-            # else:
-            #   if not isinstance(content, (list, dict)):
-            #       raise ValueError("request: %s, expected response: 'json', "
-            #                        "got: %s", endpoint, type(content))
 
         # update endpoint
         endpoint.response = content

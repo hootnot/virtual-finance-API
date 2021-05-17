@@ -6,7 +6,6 @@
 import unittest
 from click.testing import CliRunner
 
-from virtual_finance_api import virtual_finance_api
 from virtual_finance_api import cli
 
 

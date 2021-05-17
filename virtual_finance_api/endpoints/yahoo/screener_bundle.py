@@ -16,7 +16,7 @@ class Screener(VirtualAPIRequest):
     """Screener - class to handle the screener endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, name):
+    def __init__(self, name: str):
         """Instantiate a Screener request instance.
 
         Parameters
@@ -39,7 +39,7 @@ class Screener(VirtualAPIRequest):
         endpoint = self.ENDPOINT.format(name=name)
         super(Screener, self).__init__(endpoint, method=self.METHOD)
 
-    def _conversion_hook(self, s):
+    def _conversion_hook(self, s: str):
         rv = None
         try:
             rv = get_store(s, "ScreenerResultsStore")["results"]
@@ -80,7 +80,7 @@ class Screeners(VirtualAPIRequest):
         endpoint = self.ENDPOINT
         super(Screeners, self).__init__(endpoint, method=self.METHOD)
 
-    def _conversion_hook(self, s):
+    def _conversion_hook(self, s: str):
         rv = []
         ATTRS = ["title", "predefinedScr", "description", "canonicalName"]
         try:

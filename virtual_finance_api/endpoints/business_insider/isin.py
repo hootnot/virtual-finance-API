@@ -12,7 +12,7 @@ class ISIN(VirtualAPIRequest):
     """ISIN - class to handle the ISIN endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, params):
+    def __init__(self, params: dict):
         """Instantiate a ISIN equest instance.
 
         Parameters
@@ -50,7 +50,7 @@ class ISIN(VirtualAPIRequest):
 
         self.params.update(**params)
 
-    def _conversion_hook(self, response):
+    def _conversion_hook(self, response: str):
         ticker = self.params.get("query")
         lookup = "{}|".format(ticker)
 
