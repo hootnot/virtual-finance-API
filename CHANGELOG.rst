@@ -4,6 +4,19 @@ Changelog
 [Unreleased]
 ------------
 
+v0.4.3 (2021-05-17)
+-------------------
+
+Documentation Changes
+~~~~~~~~~~~~~~~~~~~~~
+
+-  [README] add codestyle ‘black’ badge
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [setup.py] delete ‘version=’ from version
+
 v0.4.2 (2021-05-17)
 -------------------
 

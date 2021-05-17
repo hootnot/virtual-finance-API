@@ -7,7 +7,7 @@ from .exceptions import VirtualFinanceAPIError
 
 __author__ = """Feite Brekeveld"""
 __email__ = "f.brekeveld@gmail.com"
-__version__ = "0.4.2"
+__version__ = "0.4.3"
 
 # Version synonym
 VERSION = __version__
