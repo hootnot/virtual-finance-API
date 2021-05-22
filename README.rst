@@ -47,13 +47,21 @@ Install
 .. code-block:: bash
 
    # Setup a virtual environment
-   $ mkdir tst_vfa
-   $ cd tst_vfa
+   $ mkdir vfa
+   $ cd vfa
    $ python3 -m venv venv38
    $ . ./venv38/bin/activate
-   (venv38) feite@salmay:~/tst_vfa$
+   (venv38) feite@salmay:~/vfa$
 
    $ pip install virtual_finance_api
+
+... Or the latest
+~~~~~~~~~~~~~~~~~
+
+.. code-block::
+
+   $ pip install git+https://github.com/hootnot/virtual-finance-API
+
 
 With *virtual_finance_api* installed, it is directly available via the commandline:
 
@@ -116,7 +124,7 @@ So, lets query for some history for IBM ...
    2021-03-29 13:30:00  135.979996  137.070007  135.509995  135.860001  4620900
 
 
-The `Virtual Finance API` provides access to data from financial sites as if it was a REST-API.
+The `Virtual Finance API` provides access to data from financial sites as if it is accessing a REST-API.
 Currently covered:
 
   + yahoo 'endpoints' to get:
