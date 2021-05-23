@@ -20,3 +20,5 @@ sphinx_rtd_theme
 sphinx-click
 sphinxcontrib-serializinghtml
 sphinxcontrib-websupport
+pytest
+pytest-cov

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import unittest
+import pytest
 import json
 from virtual_finance_api.exceptions import (  # noqa F401
     ConversionHookError,
@@ -10,14 +10,9 @@ import virtual_finance_api as fa
 from requests.exceptions import RequestException
 from virtual_finance_api.endpoints.decorators import endpoint
 from virtual_finance_api.endpoints.apirequest import APIRequest, VirtualAPIRequest
-import requests_mock
 
-try:
-    from parameterized import parameterized  # noqa F401
 
-except Exception as err:  # noqa F841
-    print("*** Please install 'parameterized' to run these tests ***")
-    exit(0)
+from .unittestsetup import API_URL, client
 
 
 @endpoint("some/{ticker}/thing", domain="ttps://test.com")  # force error
@@ -94,140 +89,116 @@ class SimulateStCh(VirtualAPIRequest):
                 return {"data": t[::-1]}
 
 
-client = None
-API_URL = "https://test.com"
+def test_client_request_params():
+    """request parameters."""
+    request_params = {"timeout": 10}
+    client = fa.Client(request_params=request_params)
+    assert client.request_params == request_params
 
 
-class TestClient(unittest.TestCase):
-    """Tests regarding the accounts endpoints."""
-
-    def setUp(self):
-        """setup for all tests."""
-        global client
-        # self.maxDiff = None
-        try:
-            # client = Client(headers={"Content-Type": "application/json"})
-            client = fa.Client()
-            # api.api_url = 'https://test.com'
-            pass
-        except Exception as e:
-            print("%s" % e)
-            exit(0)
-
-    def test__client_request_params(self):
-        """request parameters."""
-        request_params = {"timeout": 10}
-        client = fa.Client(request_params=request_params)
-        self.assertTrue(client.request_params == request_params)
-
-    def test__client_requestexception(self):
-        """force a requests exception."""
-        client = fa.Client(headers={"Content-Type": "application/json"})
-        text = (
-            "No connection " "adapters were found for 'ttps://test.com/some/IBM/thing'"
-        )
-        r = FakeRequest("IBM")
-        with self.assertRaises(RequestException) as err:
-            client.request(r)
-
-        self.assertEqual("{}".format(err.exception), text)
-
-    def test__request_status(self):
-        """expected status."""
-        r = FakeVirtualRequest("IBM")
-        self.assertTrue(r.expected_status == 200)
-
-    def test__request_chook(self):
-        """conversion_hook."""
-        r = FakeVirtualRequest("IBM")
-        self.assertTrue(r._conversion_hook("abc") == "abc")
-
-    @requests_mock.Mocker()
-    def test__data(self, mock_req):
-        """sending data."""
-        data = {"a": 10, "b": 20}
-        r = SimulatePUT("IBM", data=data)
-        mock_req.register_uri("PUT", "{}/{}".format(API_URL, r), text="")
+def test_client_requestexception():
+    """force a requests exception."""
+    client = fa.Client(headers={"Content-Type": "application/json"})
+    text = "No connection " "adapters were found for 'ttps://test.com/some/IBM/thing'"
+    r = FakeRequest("IBM")
+    with pytest.raises(RequestException) as err:
         client.request(r)
-        self.assertTrue(r.expected_status == r.status_code and r.data == data)
+    assert isinstance(err.value, (RequestException,))
 
-    @requests_mock.Mocker()
-    def test__404(self, mock_req):
-        """simulate a 404."""
-        data = {"a": 10, "b": 20}
-        r = SimulatePUT("IBM", data=data)
-        mock_req.register_uri(
-            "PUT", "{}/{}".format(API_URL, r), status_code=404, text=""
-        )
-        with self.assertRaises(VirtualFinanceAPIError) as err:
-            client.request(r)
-        self.assertTrue(err.exception.code == 404)
 
-    @requests_mock.Mocker()
-    def test__json(self, mock_req):
-        """simulate a JSON endpoint."""
-        data = {"a": 10, "b": 20}
-        r = SimulateJSON("IBM")
-        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=json.dumps(data))
+def test_request_status():
+    """expected status."""
+    r = FakeVirtualRequest("IBM")
+    assert r.expected_status == 200
+
+
+def test_request_chook():
+    """conversion_hook."""
+    r = FakeVirtualRequest("IBM")
+    assert r._conversion_hook("abc") == "abc"
+
+
+def test__data(requests_mock, client):
+    """sending data."""
+    data = {"a": 10, "b": 20}
+    r = SimulatePUT("IBM", data=data)
+    requests_mock.register_uri("PUT", "{}/{}".format(API_URL, r), text="")
+    client.request(r)
+    assert r.expected_status == r.status_code and r.data == data
+
+
+def test__404(requests_mock, client):
+    """simulate a 404."""
+    data = {"a": 10, "b": 20}
+    r = SimulatePUT("IBM", data=data)
+    requests_mock.register_uri(
+        "PUT", "{}/{}".format(API_URL, r), status_code=404, text=""
+    )
+    with pytest.raises(VirtualFinanceAPIError) as err:
         client.request(r)
-        self.assertTrue(r.response == data)
+    assert err.value.code == 404
 
-    @requests_mock.Mocker()
-    def test__json_err(self, mock_req):
-        """simulate a JSON endpoint error."""
-        data = '{"a": 10, "b: 20}'  # error on purpose
-        r = SimulateJSON("IBM")
-        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=data)
-        with self.assertRaises(ValueError) as err:
-            client.request(r)
-        self.assertTrue("response could not be loaded as JSON" in str(err.exception))
 
-    @requests_mock.Mocker()
-    def test__expected_status(self, mock_req):
-        """expected status."""
-        indata = "abcde"
-        r = Simulate("IBM")
-        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
+def test__json(requests_mock, client):
+    """simulate a JSON endpoint."""
+    data = {"a": 10, "b": 20}
+    r = SimulateJSON("IBM")
+    requests_mock.register_uri("GET", "{}/{}".format(API_URL, r), text=json.dumps(data))
+    client.request(r)
+    assert r.response == data
+
+
+def test__json_err(requests_mock, client):
+    """simulate a JSON endpoint error."""
+    data = '{"a": 10, "b: 20}'  # error on purpose
+    r = SimulateJSON("IBM")
+    requests_mock.register_uri("GET", "{}/{}".format(API_URL, r), text=data)
+    with pytest.raises(ValueError) as err:
         client.request(r)
-        self.assertTrue(
-            r.response[::-1] == indata and r.expected_status == r.status_code
-        )
 
-    @requests_mock.Mocker()
-    def test__statuschange_422(self, mock_req):
-        """status change due to conversionhook error."""
-        indata = ""
+    assert "response could not be loaded as JSON" in str(err.value)
 
-        r = SimulateStCh("IBM")
-        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
-        result = None
-        with self.assertRaises(VirtualFinanceAPIError) as err:
-            result = client.request(r)
-        self.assertTrue(
-            result is None and r.status_code == 422 and err.exception.code == 422
-        )
 
-    @requests_mock.Mocker()
-    def test__statuschange_404(self, mock_req):
-        """status change due to conversionhook error."""
-        # force a conversion_hook error by 1 elem. list
-        indata = json.dumps({"tickerlist": ["IBM"]})
+def test__expected_status(requests_mock, client):
+    """expected status."""
+    indata = "abcde"
+    r = Simulate("IBM")
+    requests_mock.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
+    client.request(r)
+    assert r.response[::-1] == indata and r.expected_status == r.status_code
 
-        r = SimulateStCh("IBM")
-        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
-        result = None
-        with self.assertRaises(VirtualFinanceAPIError) as err:
-            result = client.request(r)
-        self.assertTrue(
-            result is None and r.status_code == 404 and err.exception.code == 404
-        )
 
-    @requests_mock.Mocker()
-    def test__conversion(self, mock_req):
-        """test__conversion."""
-        indata = json.dumps({"tickerlist": ["IBM", "CSCO"]})
+def test__statuschange_422(requests_mock, client):
+    """status change due to conversionhook error."""
+    indata = ""
 
-        r = SimulateStCh("IBM")
-        mock_req.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
+    r = SimulateStCh("IBM")
+    requests_mock.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
+    result = None
+    with pytest.raises(VirtualFinanceAPIError) as err:
         result = client.request(r)
-        self.assertTrue(result == {"data": "OCSC"} and r.status_code == 200)
+
+    assert result is None and r.status_code == 422 and err.value.code == 422
+
+
+def test__statuschange_404(requests_mock, client):
+    """status change due to conversionhook error."""
+    # force a conversion_hook error by 1 elem. list
+    indata = json.dumps({"tickerlist": ["IBM"]})
+
+    r = SimulateStCh("IBM")
+    requests_mock.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
+    result = None
+    with pytest.raises(VirtualFinanceAPIError) as err:
+        result = client.request(r)
+    assert result is None and r.status_code == 404 and err.value.code == 404
+
+
+def test__conversion(requests_mock, client):
+    """test__conversion."""
+    indata = json.dumps({"tickerlist": ["IBM", "CSCO"]})
+
+    r = SimulateStCh("IBM")
+    requests_mock.register_uri("GET", "{}/{}".format(API_URL, r), text=indata)
+    result = client.request(r)
+    assert result == {"data": "OCSC"} and r.status_code == 200
