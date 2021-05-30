@@ -3,27 +3,16 @@
 
 import sys
 import click
+from typing import List
 
 import virtual_finance_api as fa
 import virtual_finance_api.compat.yfinance.endpoints as yf
+import virtual_finance_api.types as types
+
 
 client = fa.Client()
-PERIODS = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
-INTERVALS = [
-    "1m",
-    "2m",
-    "5m",
-    "15m",
-    "30m",
-    "60m",
-    "90m",
-    "1h",
-    "1d",
-    "5d",
-    "1wk",
-    "1mo",
-    "3mo",
-]
+PERIODS = [t.value for t in types.Period]
+INTERVALS = [t.value for t in types.Interval]
 
 
 @click.group()
@@ -60,7 +49,7 @@ def history():  # pragma: no cover
 @click.argument("ticker")
 def get_profile(
     info, calendar, sustainability, recommendations, ticker
-):  # pragma: no cover
+) -> None:  # pragma: no cover
     """Profile."""
     repcats = [info, calendar, sustainability, recommendations]
     if repcats.count(None) == len(repcats):
@@ -81,7 +70,7 @@ def get_profile(
 @click.argument("ticker")
 def get_financials(
     reportperiod, balancesheet, earnings, cashflow, financials, ticker
-):  # pragma: no cover
+) -> None:  # pragma: no cover
     # """Financials."""
     repcats = [balancesheet, earnings, cashflow, financials]
     if repcats.count(None) == len(repcats):
@@ -97,7 +86,7 @@ def get_financials(
 @click.option("--mutualfund", flag_value="mutualfund")
 @click.option("--institutional", flag_value="institutional")
 @click.argument("ticker")
-def get_holders(major, mutualfund, institutional, ticker):  # pragma: no cover
+def get_holders(major, mutualfund, institutional, ticker) -> None:  # pragma: no cover
     # """Holders."""
     repcats = [major, mutualfund, institutional]
     if repcats.count(None) == len(repcats):
@@ -116,7 +105,7 @@ def get_holders(major, mutualfund, institutional, ticker):  # pragma: no cover
 )
 @click.option("--csv", flag_value="csv")
 @click.argument("ticker")
-def get_history(period, interval, csv, ticker):  # pragma: no cover
+def get_history(period, interval, csv, ticker) -> None:  # pragma: no cover
     # """History."""
     params = {"period": period, "interval": interval}
     r = yf.History(ticker, params=params)
@@ -124,7 +113,7 @@ def get_history(period, interval, csv, ticker):  # pragma: no cover
     print(r.history.to_csv() if csv == "csv" else r.history)
 
 
-def do_rep(r, repcats):  # pragma: no cover
+def do_rep(r, repcats: List[str]) -> str:  # pragma: no cover
     if repcats.count(None) == len(repcats):
         raise click.BadParameter("missing info flag parameter")
 
@@ -134,7 +123,7 @@ def do_rep(r, repcats):  # pragma: no cover
             yield getattr(r, repcat)
 
 
-def main():  # pragma: no cover
+def main() -> None:  # pragma: no cover
     vfa.add_command(get_profile)
     vfa.add_command(get_financials)
     vfa.add_command(get_holders)
