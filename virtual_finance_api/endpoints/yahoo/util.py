@@ -3,6 +3,8 @@
 import time
 from datetime import datetime
 import re
+from .types import AdjustType, Period, Interval
+
 
 try:
     import rapidjson as json
@@ -11,21 +13,21 @@ except ImportError as err:
     import json
 
 
-def get_store(resp, store):
+def get_store(response: str, store: str) -> dict:
     jsontxt = (
-        resp.split("root.App.main =")[1].split("(this)")[0].split(";\n}")[0].strip()
+        response.split("root.App.main =")[1].split("(this)")[0].split(";\n}")[0].strip()
     )
     return json.loads(jsontxt)["context"]["dispatcher"]["stores"][store]
 
 
-def response2json(resp):
-    _resp = get_store(resp, "QuoteSummaryStore")
+def response2json(response: str) -> dict:
+    _resp = get_store(response, "QuoteSummaryStore")
     _resp = json.dumps(_resp).replace("{}", "null")
     _resp = re.sub(r"\{[\'|\"]raw[\'|\"]:(.*?),(.*?)\}", r"\1", _resp)
     return json.loads(_resp)
 
 
-def extract_domain(url):
+def extract_domain(url: str):
     m = re.match("^.*://(?:www.|)(.*)", url)
     try:
         return m.group(1)
@@ -35,8 +37,8 @@ def extract_domain(url):
 
 
 def hprocopt(
-    period="1mo",
-    interval="1d",
+    period: Period = Period.p_1mo,
+    interval: Interval = Interval.i_1d,
     start=None,
     end=None,
     prepost=False,
@@ -47,7 +49,7 @@ def hprocopt(
     rounding=False,
     tz=None,
     **kwargs,
-):
+) -> dict:
     def convtime(t):
         if isinstance(t, datetime):
             return int(time.mktime(t.timetuple()))
@@ -72,9 +74,10 @@ def hprocopt(
     }
 
     if auto_adjust:
-        params.update({"adjust": "auto"})
+        params.update({"adjust": AdjustType.auto})
+
     elif back_adjust:
-        params.update({"adjust": "backadjust"})
+        params.update({"adjust": AdjustType.backadjust})
 
     if end is None:
         params.update({"period2": int(time.time())})
