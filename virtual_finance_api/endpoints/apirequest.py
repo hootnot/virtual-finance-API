@@ -2,19 +2,23 @@
 
 """Handling of API requests."""
 from abc import ABC, abstractmethod
+from typing import Union
 
 
 class APIRequest(ABC):
     """Base Class for API-request classes."""
 
     @abstractmethod
-    def __init__(self, endpoint, method="GET", expected_status=200):
+    def __init__(
+        self, endpoint: str, method: str = "GET", expected_status: int = 200
+    ) -> None:
         """Instantiate an API request.
 
         Parameters
         ----------
         endpoint : string
             the URL format string
+
         method : string
             the method for the request. Default: GET.
         """
@@ -26,15 +30,15 @@ class APIRequest(ABC):
         self.method = method
 
     @property
-    def expected_status(self):
+    def expected_status(self) -> int:
         return self._expected_status
 
     @property
-    def status_code(self):
+    def status_code(self) -> int:
         return self._status_code
 
     @status_code.setter
-    def status_code(self, value):
+    def status_code(self, value: int) -> int:
         # if value != self._expected_status:
         #    raise ValueError("{} {} {:d}".format(self, self.method, value))
         self._status_code = value
@@ -45,11 +49,11 @@ class APIRequest(ABC):
         return self._response
 
     @response.setter
-    def response(self, value):
+    def response(self, value) -> None:
         """response - set the response of the request."""
         self._response = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         """return the endpoint."""
         return self._endpoint
 
@@ -63,5 +67,5 @@ class VirtualAPIRequest(APIRequest):
     """
 
     @abstractmethod
-    def _conversion_hook(self, s):
+    def _conversion_hook(self, s: str) -> Union[str, dict]:
         return s

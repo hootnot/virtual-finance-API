@@ -2,7 +2,7 @@
 """decorators."""
 
 
-def dyndoc_insert(src):
+def dyndoc_insert(src: str):
     """docstring_insert - a decorator to insert API-docparts dynamically."""
     # manipulating docstrings this way is tricky due to indentation
     # the JSON needs leading whitespace to be interpreted correctly
@@ -14,7 +14,7 @@ def dyndoc_insert(src):
 
     import re
 
-    def mkblock(d, flag=0):
+    def mkblock(d: dict, flag: int = 0) -> str:
         # response, pretty formatted
         v = json.dumps(d, indent=2)
         if flag == 1:
@@ -58,13 +58,19 @@ def dyndoc_insert(src):
     return dec
 
 
-def endpoint(url, domain=None, method="GET", response_type="txt", expected_status=200):
+def endpoint(
+    url: str,
+    domain: str = None,
+    method: str = "GET",
+    response_type: str = "txt",
+    expected_status: int = 200,
+) -> type:
     """endpoint - decorator to manipulate the REST-service endpoint.
     The endpoint decorator sets the endpoint and the method for the class
     to access the REST-service.
     """
 
-    def dec(obj):
+    def dec(obj: type) -> type:
         obj.ENDPOINT = url
         obj.DOMAIN = domain
         obj.METHOD = method

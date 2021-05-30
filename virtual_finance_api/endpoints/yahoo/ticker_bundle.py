@@ -27,7 +27,7 @@ class Yhoo(APIRequest):
     """Yhoo - base class to handle the Yhoo endpoints that require a ticker."""
 
     @abstractmethod
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         """Instantiate a Yhoo APIRequest instance.
 
         Parameters
@@ -40,7 +40,7 @@ class Yhoo(APIRequest):
         self._ticker = ticker
 
     @property
-    def ticker(self):
+    def ticker(self) -> str:
         return self._ticker
 
 
@@ -49,7 +49,7 @@ class Financials(VirtualAPIRequest, Yhoo):
     """Financials - class to handle the financials endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         """Instantiate a Financials APIRequest instance.
 
         Parameters
@@ -75,7 +75,7 @@ class Financials(VirtualAPIRequest, Yhoo):
         """
         super(Financials, self).__init__(ticker)
 
-    def _conversion_hook(self, s: str):
+    def _conversion_hook(self, s: str) -> dict:
         """transform the response into a 'standardized' JSON response
 
         for all groups we want to have yearly and quarterly, like:
@@ -130,7 +130,7 @@ class History(VirtualAPIRequest, Yhoo):
     """History - class to handle the history endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, ticker: str, params: dict):
+    def __init__(self, ticker: str, params: dict) -> None:
         """Instantiate a History APIRequest instance.
 
         Parameters
@@ -171,7 +171,7 @@ class History(VirtualAPIRequest, Yhoo):
             self.params,
         )
 
-    def _conversion_hook(self, s: str):
+    def _conversion_hook(self, s: str) -> dict:
         """call the conversionhook of the parent class to get our data
         then standardize the JSON data here to get:
 
@@ -183,7 +183,7 @@ class History(VirtualAPIRequest, Yhoo):
 
         """
 
-        def _ordered_timeitems(d: dict, cat: str):
+        def _ordered_timeitems(d: dict, cat: str) -> list:
             """
             dividends / splits
             yahoo has dicts with items like:
@@ -212,7 +212,7 @@ class History(VirtualAPIRequest, Yhoo):
             else:
                 return res
 
-        def adjust(ohlcdata, adjustType: AdjustType = None):
+        def adjust(ohlcdata, adjustType: AdjustType = None) -> dict:
             """price adjustments for the historical data.
 
             for yfinance compatibility there are 2 adjustment types:
@@ -296,7 +296,7 @@ class Holders(VirtualAPIRequest, Yhoo):
     """Holders - class to handle the holders endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         """Instantiate a Holders APIRequest instance.
 
         Parameters
@@ -322,7 +322,7 @@ class Holders(VirtualAPIRequest, Yhoo):
         """
         super(Holders, self).__init__(ticker)
 
-    def _conversion_hook(self, s: str):
+    def _conversion_hook(self, s: str) -> dict:
         """call the conversionhook of the parent class to get our data
         then standardize the JSON data here to get:
 
@@ -339,7 +339,7 @@ class Holders(VirtualAPIRequest, Yhoo):
             }
         """
 
-        def normalize(data: dict, K: str):
+        def normalize(data: dict, K: str) -> dict:
             _record = {}
             _legend = {}
             for k, v in data[K].items():
@@ -408,7 +408,7 @@ class Options(VirtualAPIRequest, Yhoo):
     """Options - class to handle the options endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, ticker: str, params: dict = None):
+    def __init__(self, ticker: str, params: dict = None) -> None:
         """Instantiate a Options APIRequest instance.
 
         Parameters
@@ -437,7 +437,7 @@ class Options(VirtualAPIRequest, Yhoo):
         super(Options, self).__init__(ticker)
         self.params = params
 
-    def _conversion_hook(self, s: str):
+    def _conversion_hook(self, s: str) -> dict:
 
         resp = {}
         try:
@@ -465,7 +465,7 @@ class Profile(VirtualAPIRequest, Yhoo):
     """Profile - class to handle the profile endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, ticker: str):
+    def __init__(self, ticker: str) -> None:
         """Instantiate a Profile APIRequest instance.
 
         Parameters
@@ -490,7 +490,7 @@ class Profile(VirtualAPIRequest, Yhoo):
         """
         super(Profile, self).__init__(ticker)
 
-    def _conversion_hook(self, s: str):
+    def _conversion_hook(self, s: str) -> dict:
         """call the conversionhook of the parent class to get our data
         then standardize the JSON data here to get:
 
@@ -505,7 +505,7 @@ class Profile(VirtualAPIRequest, Yhoo):
         """
         resp = {}
 
-        def info(response: dict):
+        def info(response: dict) -> dict:
             rv = {}
             SECTIONS = [
                 "summaryProfile",
@@ -527,13 +527,13 @@ class Profile(VirtualAPIRequest, Yhoo):
 
             return rv
 
-        def recommendations(response: dict):
+        def recommendations(response: dict) -> dict:
             return response["upgradeDowngradeHistory"]["history"]
 
-        def calendar(response: dict):
+        def calendar(response: dict) -> dict:
             return response["calendarEvents"]
 
-        def sustainability(response: dict):
+        def sustainability(response: dict) -> dict:
             return response["esgScores"]
 
         try:

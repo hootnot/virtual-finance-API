@@ -22,7 +22,7 @@ class YhooIndex(VirtualAPIRequest):
     """YhooIndex - request class to handle the index overview endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, index: str):
+    def __init__(self, index: str) -> None:
         """Instantiate a YhooIndex APIRequest instance.
 
         Parameters
@@ -56,10 +56,10 @@ class YhooIndex(VirtualAPIRequest):
         self._index = index
 
     @property
-    def index(self):
+    def index(self) -> str:
         return self._index
 
-    def _conversion_hook(self, s: str):
+    def _conversion_hook(self, s: str) -> dict:
         rv = None
         try:
             data = pd.read_html(s)

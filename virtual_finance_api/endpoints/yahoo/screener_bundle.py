@@ -6,6 +6,7 @@ from .responses.screener_bundle import responses
 from ...exceptions import ConversionHookError
 from .util import get_store
 import logging
+from typing import List
 
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ class Screener(VirtualAPIRequest):
     """Screener - class to handle the screener endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """Instantiate a Screener request instance.
 
         Parameters
@@ -39,8 +40,8 @@ class Screener(VirtualAPIRequest):
         endpoint = self.ENDPOINT.format(name=name)
         super(Screener, self).__init__(endpoint, method=self.METHOD)
 
-    def _conversion_hook(self, s: str):
-        rv = None
+    def _conversion_hook(self, s: str) -> dict:
+        rv = {}
         try:
             rv = get_store(s, "ScreenerResultsStore")["results"]
 
@@ -59,7 +60,7 @@ class Screeners(VirtualAPIRequest):
     """Screeners - class to handle the screeners endpoint."""
 
     @dyndoc_insert(responses)
-    def __init__(self):
+    def __init__(self) -> None:
         """Instantiate a Screeners APIRequest instance.
 
         returns the available prefined screeners.
@@ -80,7 +81,7 @@ class Screeners(VirtualAPIRequest):
         endpoint = self.ENDPOINT
         super(Screeners, self).__init__(endpoint, method=self.METHOD)
 
-    def _conversion_hook(self, s: str):
+    def _conversion_hook(self, s: str) -> List:
         rv = []
         ATTRS = ["title", "predefinedScr", "description", "canonicalName"]
         try:

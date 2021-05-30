@@ -18,7 +18,7 @@ DEFAULT_HEADERS = {"Accept-Encoding": "gzip, deflate"}
 
 
 class Client:
-    def __init__(self, headers: dict = None, request_params: dict = None):
+    def __init__(self, headers: dict = None, request_params: dict = None) -> None:
         """Instantiate a Client instance.
 
         Parameters
@@ -65,7 +65,7 @@ class Client:
             logger.info("applying headers %s", ",".join(headers.keys()))
 
     @property
-    def request_params(self):
+    def request_params(self) -> dict:
         """request_params property."""
         return self._request_params
 
