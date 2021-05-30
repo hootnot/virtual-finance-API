@@ -4,6 +4,33 @@ Changelog
 [Unreleased]
 ------------
 
+v0.5.0 (2021-05-30)
+-------------------
+
+New Features
+~~~~~~~~~~~~
+
+-  [types] types Period, Interval added
+
+Refactoring
+~~~~~~~~~~~
+
+-  [cli] type hints, apply yahoo types
+
+-  [tests] switch to pytest from unittest
+
+-  [cli] rename entrypoint to vfapi
+
+Documentation Changes
+~~~~~~~~~~~~~~~~~~~~~
+
+-  [README] minor changes/extension in install
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [setup] correct URL to repository
+
 v0.4.3 (2021-05-17)
 -------------------
 
