@@ -1,5 +1,7 @@
-Click>=7.0
+Click==7.1.2
 lxml>=4.6.2
 requests>=2.25
 pandas>=1.1.5
 rapidjson
+yachain>=0.1.4
+typer>=0.3.2
