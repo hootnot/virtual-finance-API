@@ -77,7 +77,7 @@ def hprocopt(
         params.update({"adjust": AdjustType.auto})
 
     elif back_adjust:
-        params.update({"adjust": AdjustType.backadjust})
+        params.update({"adjust": AdjustType.back})
 
     if end is None:
         params.update({"period2": int(time.time())})

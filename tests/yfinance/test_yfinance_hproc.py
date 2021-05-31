@@ -26,7 +26,7 @@ from ..unittestsetup import API_URL, client
         ),
         (
             {"start": "2000-01-01", "auto_adjust": False, "back_adjust": True},
-            {"period1": 946684800, "adjust": "backadjust"},
+            {"period1": 946684800, "adjust": "back"},
         ),
         (
             {"start": "2000-01-01", "prepost": True},

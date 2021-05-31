@@ -5,7 +5,7 @@ from enum import Enum
 
 class AdjustType(str, Enum):
     auto = "auto"
-    backadjust = "backadjust"
+    back = "back"
 
 
 class Period(str, Enum):

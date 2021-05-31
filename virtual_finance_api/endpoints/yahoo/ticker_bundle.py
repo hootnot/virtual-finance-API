@@ -229,7 +229,7 @@ class History(VirtualAPIRequest, Yhoo):
             if adjustType.value == AdjustType.auto:
                 num, denom = "close", "adjclose"
 
-            elif adjustType.value == AdjustType.backadjust:
+            elif adjustType.value == AdjustType.back:
                 num, denom = "adjclose", "close"
 
             else:
