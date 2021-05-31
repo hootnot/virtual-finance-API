@@ -226,15 +226,18 @@ class History(VirtualAPIRequest, Yhoo):
                            'close': [...],
                            'volume': [...]}
             """
-            if adjustType.value == AdjustType.auto:
+            if adjustType is None:
+                logger.warning("adjust: not set, returning plain data")
+                return ohlcdata
+
+            elif adjustType.value == AdjustType.auto:
                 num, denom = "close", "adjclose"
 
             elif adjustType.value == AdjustType.back:
                 num, denom = "adjclose", "close"
 
             else:
-                logger.warning("adjust: not set, returning plain data")
-                return ohlcdata
+                raise ValueError("illegal value for adjustType")
 
             ratio = [
                 ohlcdata[num][i] / ohlcdata[denom][i]
@@ -278,7 +281,7 @@ class History(VirtualAPIRequest, Yhoo):
             # adjust data ?
             _pAdjust = self.params.get("adjust", None)
             if _pAdjust:
-                logger.info("adjust: %s %s", self.ticker, _pAdjust)
+                logger.info("adjust data: %s %s", self.ticker, _pAdjust)
                 tdata["ohlcdata"] = adjust(
                     tdata["ohlcdata"], adjustType=getattr(AdjustType, _pAdjust)
                 )
