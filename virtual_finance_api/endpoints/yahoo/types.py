@@ -36,3 +36,8 @@ class Interval(str, Enum):
     i_1wk = "1wk"
     i_1mo = "1mo"
     i_3mo = "3mo"
+
+
+class ReportPeriod(str, Enum):
+    y = "y"  # yearly
+    q = "q"  # quarterly
