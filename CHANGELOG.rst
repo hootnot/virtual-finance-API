@@ -4,6 +4,33 @@ Changelog
 [Unreleased]
 ------------
 
+v0.6.0 (2021-06-01)
+-------------------
+
+New Features
+~~~~~~~~~~~~
+
+-  [types] ReportPeriod added
+
+Bug Fixes
+~~~~~~~~~
+
+-  [History] handle adjustment of data correct
+
+Refactoring
+~~~~~~~~~~~
+
+-  [cli] use typer instead of click
+
+-  option processing regarding History requests split hprocopt into
+   procopt for the yahoo History request and yfprocopt for the yfinance
+   compat. History request
+
+Administration and Chores
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  [requirements] update dependencies
+
 v0.5.0 (2021-05-30)
 -------------------
 
