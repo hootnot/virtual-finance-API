@@ -3,6 +3,7 @@
 import time
 from datetime import datetime
 import re
+from typing import Union
 from .types import AdjustType, Period, Interval
 
 
@@ -27,7 +28,7 @@ def response2json(response: str) -> dict:
     return json.loads(_resp)
 
 
-def extract_domain(url: str):
+def extract_domain(url: str) -> str:
     m = re.match("^.*://(?:www.|)(.*)", url)
     try:
         return m.group(1)
@@ -36,35 +37,30 @@ def extract_domain(url: str):
         return ""
 
 
-def hprocopt(
+def convtime(t: Union[str, datetime]) -> int:
+    if isinstance(t, datetime):
+        return int(time.mktime(t.timetuple()))
+    else:
+        return int(time.mktime(time.strptime(str(t), "%Y-%m-%d")))
+
+
+def procopt(
     period: Period = Period.p_1mo,
     interval: Interval = Interval.i_1d,
-    start=None,
-    end=None,
-    prepost=False,
-    actions=True,
-    auto_adjust=True,
-    back_adjust=False,
-    proxy=None,
-    rounding=False,
-    tz=None,
+    start: Union[None, datetime, str] = None,
+    end: Union[None, datetime, str] = None,
+    prepost: bool = False,
+    actions: bool = True,
+    adjust: Union[None, AdjustType] = None,
+    rounding: bool = False,
+    tz: Union[None, str] = None,
     **kwargs,
 ) -> dict:
-    def convtime(t):
-        if isinstance(t, datetime):
-            return int(time.mktime(t.timetuple()))
-        else:
-            return int(time.mktime(time.strptime(str(t), "%Y-%m-%d")))
-
-    if auto_adjust and back_adjust:
-        raise ValueError("auto/back adjust are mutually exclusive")
-
-    if proxy:
-        logger.warning("proxy is ignored: configure proxy via the Client")
+    """procopt - parse parameters."""
 
     params = {
         "events": "div,splits",
-        "interval": interval.lower(),
+        "interval": interval,
         "includePrePost": prepost,
         "includeAdjustedClose": True,
         "prepost": prepost,
@@ -73,11 +69,8 @@ def hprocopt(
         "rounding": rounding,
     }
 
-    if auto_adjust:
-        params.update({"adjust": AdjustType.auto})
-
-    elif back_adjust:
-        params.update({"adjust": AdjustType.back})
+    if adjust:
+        params.update({"adjust": adjust})
 
     if end is None:
         params.update({"period2": int(time.time())})
@@ -89,10 +82,10 @@ def hprocopt(
         params.update({"period1": convtime(start)})
 
     else:
-        if period.lower() == "max":
+        if period == Period.p_max:
             params.update({"period1": -2208988800})
 
         else:
-            params.update({"range": period.lower()})
+            params.update({"range": period.value})
 
     return params

@@ -6,7 +6,8 @@ These requests are derived from the Yahoo base classes, but all classes provide
 Pandas series and some return a Pandas dataframe, just like *yfinance* does.
 """
 
-from .util import camel2title, extract_domain, YFHolders
+from .util import camel2title, YFHolders, yfprocopt
+from virtual_finance_api.endpoints.yahoo.util import extract_domain
 
 import pandas as pd
 import numpy as np
@@ -487,7 +488,8 @@ class History(yhe.History):
 
 
         """
-        super(History, self).__init__(ticker, params=params)
+        tparams = yfprocopt(**params)
+        super(History, self).__init__(ticker, params=tparams)
         logger.info(
             "%s instantiated, ticker: %s, params: %s",
             self.__class__.__name__,

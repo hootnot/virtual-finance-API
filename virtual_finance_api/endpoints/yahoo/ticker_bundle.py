@@ -2,7 +2,7 @@
 """All Yahoo requests that require ticker as route parameter in the request."""
 
 from ..decorators import endpoint, dyndoc_insert
-from .util import response2json, extract_domain, hprocopt
+from .util import response2json, extract_domain, procopt
 
 import logging
 import pandas as pd
@@ -162,7 +162,7 @@ class History(VirtualAPIRequest, Yhoo):
 
         """
         super(History, self).__init__(ticker)
-        self.params = hprocopt(**params)
+        self.params = procopt(**params)
 
         logger.info(
             "%s instantiated, ticker: %s, params: %s",
@@ -281,10 +281,7 @@ class History(VirtualAPIRequest, Yhoo):
             # adjust data ?
             _pAdjust = self.params.get("adjust", None)
             if _pAdjust:
-                logger.info("adjust data: %s %s", self.ticker, _pAdjust)
-                tdata["ohlcdata"] = adjust(
-                    tdata["ohlcdata"], adjustType=getattr(AdjustType, _pAdjust)
-                )
+                tdata["ohlcdata"] = adjust(tdata["ohlcdata"], adjustType=_pAdjust)
 
         except Exception as err:
             logger.error(err)
